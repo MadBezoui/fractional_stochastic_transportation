@@ -1,0 +1,20 @@
+Fractional Stochastic Transportation - Supplementary Archive
+============================================================
+
+This archive contains the source code, logs, and generated tables for the computational study.
+
+Files included:
+- computational_validation/get_table_data.py
+- computational_validation/gurobi.log
+- computational_validation/results/ph_history.csv
+- computational_validation/src/experiments.py
+- computational_validation/src/model_builder.py
+- computational_validation/src/progressive_hedging.py
+- computational_validation/src/scenario_tree.py
+- generate_all_tables.py
+- manuscript/main2.pdf
+- manuscript/main2.tex
+- manuscript/tables_output.txt
+
+To reproduce the tables from the manuscript, run:
+    python generate_all_tables.py
