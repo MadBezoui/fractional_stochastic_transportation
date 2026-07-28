@@ -787,18 +787,19 @@ Symbol & Interpretation & Unit & Comment\\
   \item \(\pi_{jt}\geq0\): lost-sales penalty;
   \item \(e_{ijkt}\geq0\): unit carbon emissions;
   \item \(A_t\geq0\): initial carbon allowance for period \(t\);
-  \item \(p_t^b>p_t^s\geq0\): allowance buying and selling prices;
-  \item \(\overline B_t<\infty\): upper bound on allowance purchases;
-  \item \(\overline S_t<\infty\): upper bound on allowance sales;
+  \item \(p_t^b\geq0\): unit price of purchased allowances;
+  \item \(p_t^s\geq0\): unit revenue from sold allowances;
+  \item \(\overline{B}_t<\infty\): upper bound on allowance purchases;
+  \item \(\overline{S}_t<\infty\): upper bound on allowance sales;
   \item \(z_j^0\geq0\): initial physical usable inventory;
-  \item \(\overline z_{jt}<\infty\): physical inventory capacity;
+  \item \(\overline{z}_{jt}<\infty\): physical inventory capacity;
   \item \(\delta_j\in[0,1)\): physical inventory deterioration
   coefficient;
   \item \(\psi_j>0\): dimensionless memory coupling coefficient;
   \item \(\rho_j\geq0\): normalized memory dissipation coefficient;
-  \item \(\chi_j \in [0,1)\): memory modulation coefficient on
-  fulfillment. This memory modulation coefficient is calibrated separately from observations linking beginning-of-period congestion to reductions in effective fulfillment capacity;
-  \item \(\overline m_{jt}<\infty\): upper bound on absolute memory
+  \item \(\chi_j (calibrated separately from observations linking beginning-of-period congestion to reductions in effective fulfillment capacity)\in[0,1)\): memory modulation coefficient on
+  fulfillment;
+  \item \(\overline{m}_{jt}<\infty\): upper bound on absolute memory
   state;
   \item \(\gamma_j\in[0,1]\): minimum cumulative service fraction;
   \item \(\alpha\in(0,1]\): fractional order;
@@ -988,7 +989,7 @@ with proportional deterioration \(\delta_j\in[0,1)\):
   -
   q_{jt}^{\omega},
   \qquad
-  0\leq z_{jt}^{\omega}\leq\overline z_{jt}.
+  0\leq z_{jt}^{\omega}\leq\overline{z}_{jt}.
   \label{eq:physical-balance}
 \end{equation}
 
@@ -1002,7 +1003,7 @@ defined in \cref{eq:discrete-operator}:
   -
   \rho_jm_{jt}^{\omega},
   \qquad
-  -\overline m_{jt}\leq m_{jt}^{\omega}\leq\overline m_{jt}.
+  -\overline{m}_{jt}\leq m_{jt}^{\omega}\leq\overline{m}_{jt}.
   \label{eq:discrete-fractional-balance}
 \end{equation}
 
@@ -1105,9 +1106,9 @@ period in which they are allocated. Carbon feasibility requires
 \end{equation}
 Trading variables satisfy finite market bounds:
 \begin{equation}
-  0\leq b_t^\omega\leq\overline B_t,
+  0\leq b_t^\omega\leq\overline{B}_t,
   \qquad
-  0\leq s_t^\omega\leq\overline S_t.
+  0\leq s_t^\omega\leq\overline{S}_t.
   \label{eq:trading-bounds}
 \end{equation}
 
@@ -1336,11 +1337,11 @@ Defining \(K_t^{(1)}=\Delta\tau\sum_{s=1}^{t}\theta_j^s\), which evaluates to
 \end{proof}
 
 \begin{remark}
-The explicit bound \(\overline m_{jt}\) in
+The explicit bound \(\overline{m}_{jt}\) in
 \cref{eq:discrete-fractional-balance} is an operational safety limit. To
 avoid artificially truncating dynamically valid memory trajectories,
-\(\overline m_{jt}\) should satisfy
-\(\overline m_{jt}\geq K_t^{(\alpha)}\max_{\tau\leq t}\left\{\psi_j(\overline{r}_{j\tau}+\overline{d}_{j\tau})\right\}\)
+\(\overline{m}_{jt}\) should satisfy
+\(\overline{m}_{jt}\geq K_t^{(\alpha)}\max_{\tau\leq t}\left\{\psi_j(\overline{r}_{j\tau}+\overline{d}_{j\tau})\right\}\)
 unless truncation of high-congestion states is intentionally modeled.
 \end{remark}
 
@@ -1529,7 +1530,7 @@ out-of-sample evaluation are required as specified in
         \draw[arrow] (mult) -- (subprob);
         \draw[arrow] (consensus) -- (stop) node[midway, above, font=\small, text=gray!80] {Eval};
     \end{tikzpicture}
-    \caption{Piecewise-linear approximation of quadratic-penalty Progressive Hedging. Squared penalties associated with binary activation variables may be represented exactly as affine terms at each iteration because the consensus is fixed. Continuous disagreement penalties remain quadratic unless a declared approximation is used (in our PuLP implementation, a convex piecewise-linear secant approximation (PWL-PH) is employed for continuous variables to maintain MILP solvability).}
+    \caption{Piecewise-linear approximation of quadratic-penalty Progressive Hedging. Squared penalties associated with binary activation variables may be represented exactly as affine terms at each iteration because the consensus is fixed. Continuous disagreement penalties remain quadratic unless a declared approximation is used (in our PuLP implementation, a convex piecewise-linear secant approximation is employed for continuous variables to maintain MILP solvability).}
     \label{fig:ph_flowchart}
 \end{figure}
 \label{sec:ph-cvar}
@@ -1676,19 +1677,31 @@ To maintain a Mixed-Integer Linear Programming (MILP) structure in the standard 
     \label{fig:ph_conv}
 \end{figure}
 
-Because binary activation variables are duplicated across scenarios, the subproblems are inherently nonconvex mixed-integer programs. While a standard quadratic penalty would yield MIQPs, our exact PWL discretization preserves the MILP structure. Nonetheless, classical PH convergence theory does not guarantee global optimality. An implementation must track both the primal non-anticipativity residual $R_{\mathrm{NAC}}^r$ and the dual proxy residual $R_{\mathrm{proxy}}^r$:
+Because binary activation variables are duplicated across scenarios,
+the quadratic penalty in \cref{eq:ph-penalty} yields nonconvex
+mixed-integer subproblems. Classical PH convergence theory does not
+guarantee global optimality in this setting. An implementation must
+track:
 \begin{align}
   R_{\mathrm{NAC}}^r
   &=
   \left[
-    \sum_{n \in \mathcal{N}} \sum_{\omega \in \Omega(n)} p_\omega \|v_n^{\omega,r} - \bar{v}_n^r\|_2^2
+    \sum_{t=0}^{N}
+    \sum_{n\in\mathcal{N}_t}
+    \sum_{\omega\in\Omega(n)}
+    p_\omega
+    \left\|
+      v_t^{\omega,r}-\overline{v}_n^r
+    \right\|_2^2
   \right]^{1/2},
   \label{eq:nac-residual}\\
   R_{\mathrm{proxy}}^r
   &=
-  \left[
-    \sum_{n \in \mathcal{N}} \rho_{\mathrm{PH}}^2 \|\bar{v}_n^r - \bar{v}_n^{r-1}\|_2^2
-  \right]^{1/2},
+  \frac{
+    |Z^r-Z^{r-1}|
+  }{
+    \max\{1,|Z^{r-1}|\}
+  },
   \label{eq:objective-residual}
 \end{align}
 where \(Z^r=\sum_{\omega\in\Omega}p_\omega\widetilde\Phi^{\omega,r}\)
@@ -1805,7 +1818,7 @@ An empirical conclusion may be retained only when:
 The complete computational archive---including Python source code (PuLP modeling), the generated input scenario tree instance, random seeds, raw CSV outputs of the Progressive Hedging iterations, and parameter estimation profiles---is provided in the supplementary material for independent verification.
 
 \subsection{Instance Definition Table}
-Table~\ref{tab:instance_def} summarizes the complete instance definition for the reproducible simulation. Table~\ref{tab:tree} explicitly defines the scenario tree, and Table~\ref{tab:scenarios} provides the scenario-level optimization outcomes. The four-scenario, two-period instance is a minimal multistage implementation check of the formulation.
+Table~\ref{tab:instance_def} summarizes the complete instance definition for the reproducible simulation. Table~\ref{tab:tree} explicitly defines the scenario tree, and Table~\ref{tab:scenarios} provides the scenario-level optimization outcomes. The four-scenario, two-period instance is a small decomposition check equivalent to a two-stage special case of the multistage formulation.
 
 \begin{table}[ht]\small
 \centering
@@ -1820,11 +1833,11 @@ $Q_{kt}$ & 50 $\forall k, t$ \\
 $f_k$ & $f_1=1000, f_2=200$ (Activation cost) \\
 $c_{ijkt}$ & $c_{ij1t}=5.0, c_{ij2t}=15.0$ $\forall i, j, t$ \\
 $e_{ijkt}$ & $e_{ij1t}=0.2, e_{ij2t}=0.8$ $\forall i, j, t$ \\
-$A_t, \overline B_t, \overline S_t, p_t^b, p_t^s$ & $A_t=10, \overline B_t=50, \overline S_t=50, p_t^b=10, p_t^s=8$ \\
+$A_t, \overline{B}_t, \overline{S}_t, p_t^b, p_t^s$ & $A_t=10, \overline{B}_t=50, \overline{S}_t=50, p_t^b=10, p_t^s=8$ \\
 $h_{jt}, \pi_{jt}$ & $h_{jt}=2, \pi_{jt}=500$ \\
 $\delta_j, \gamma_j$ & $\delta_j=0.05, \gamma_j=0.1$ \\
 $\alpha, \rho_j, \psi_j, \chi_j$ & $\alpha=0.8, \rho_j=0.1, \psi_j=0.5, \chi_j=0.5$ \\
-$z_{j0}, \overline m_{jt}$ & $z_{j0}=0, \overline m_{jt}=1000$ \\
+$z_{j0}, \overline{m}_{jt}$ & $z_{j0}=0, \overline{m}_{jt}=1000$ \\
 $\beta, \lambda, \Delta\tau$ & $\beta=0.95, \lambda=0.5, \Delta\tau=1$ \\
 Hardware \& OS & Apple M1, macOS \\
 Solver \& Threads & Gurobi 10.0, Default threads, Presolve Auto \\
@@ -1854,27 +1867,7 @@ $\omega_{3}$ & 0.25 & 93.8 & 0.0 & 0.0 & -130.0 & \textbf{-36.2} & 3.8 & 0.0 & 1
 
 \begin{table}[ht]\small
 \centering
-\caption{Period-specific carbon trading verification for Proposition 2. The optimality condition $b_t^\omega s_t^\omega = 0$ holds strictly across all periods and scenarios.}
-\begin{tabular}{lrrrrrr}
-\toprule
-Scenario & Period & Emissions ($E_t^\omega$) & Allowance ($A_t$) & Buy ($b_t^\omega$) & Sell ($s_t^\omega$) & $b_t^\omega s_t^\omega$ \\
-\midrule
-$\omega_{0}$ & 1 & 9.2 & 10.0 & 0.0 & 0.8 & 0.0 \\
-$\omega_{0}$ & 2 & 10.0 & 10.0 & 0.0 & 0.0 & 0.0 \\
-$\omega_{1}$ & 1 & 9.2 & 10.0 & 0.0 & 0.8 & 0.0 \\
-$\omega_{1}$ & 2 & 2.5 & 10.0 & 0.0 & 7.5 & 0.0 \\
-$\omega_{2}$ & 1 & 2.5 & 10.0 & 0.0 & 7.5 & 0.0 \\
-$\omega_{2}$ & 2 & 3.8 & 10.0 & 0.0 & 6.2 & 0.0 \\
-$\omega_{3}$ & 1 & 2.5 & 10.0 & 0.0 & 7.5 & 0.0 \\
-$\omega_{3}$ & 2 & 1.2 & 10.0 & 0.0 & 8.8 & 0.0 \\
-\bottomrule
-\end{tabular}
-\label{tab:carbon_period}
-\end{table}
-
-\begin{table}[ht]\small
-\centering
-\caption{Explicit four-scenario tree structure defining parent-child relationships, conditional probabilities, and nodal demands.}
+\caption{Explicit four-scenario tree structure defining parent-child relationships, conditional probabilities, and nodal demands. The four-scenario tree is manually specified for implementation checking. It is not generated by the clustering and nested-distance reduction protocol of Section 3.4; consequently, no tree-reduction error is reported for this toy instance.}
 \begin{tabular}{llrrr}
 \toprule
 Node & Parent & Period & Demand vector ($d_1, d_2$) & Cond. Prob. \\
@@ -1890,6 +1883,21 @@ $n_6$ & $n_{2}$ & 2 & (2.5, 3.8) & 0.50 \\
 \label{tab:tree}
 \end{table}
 
+\begin{table}[ht]\small
+\centering
+\caption{Scenario-path mapping, enabling independent interpretability of non-anticipativity and the nodal tree structure.}
+\begin{tabular}{lllr}
+\toprule
+Scenario & Period-1 node & Period-2 node & Probability \\
+\midrule
+$\omega_{0}$ & $n_{1}$ & $n_{3}$ & 0.25 \\
+$\omega_{1}$ & $n_{1}$ & $n_{4}$ & 0.25 \\
+$\omega_{2}$ & $n_{2}$ & $n_{5}$ & 0.25 \\
+$\omega_{3}$ & $n_{2}$ & $n_{6}$ & 0.25 \\
+\bottomrule
+\end{tabular}
+\label{tab:scenario_paths}
+\end{table}
 
 \label{sec:comp-study}
 
@@ -1897,67 +1905,6 @@ $n_6$ & $n_{2}$ & 2 & (2.5, 3.8) & 0.50 \\
 \label{ssec:numerical-validation}
 
 To formally validate the mathematical framework and verify the algorithmic convergence of the Progressive Hedging scheme, we conduct a computational study on a deterministic equivalent instance. The model is implemented in Python using the PuLP library and solved via Gurobi.
-
-\begin{table}[ht]\small
-\centering
-\caption{Performance comparison: Deterministic Equivalent (DE) versus Approximate Progressive Hedging (PWL-PH).}
-\begin{tabular}{lrrrrrrr}
-\toprule
-Method & $y_1$ & $y_2$ & Feasible objective & Runtime & Final $R_{\mathrm{NAC}}$ & Iterations & Gap \\
-\midrule
-Deterministic equivalent & 1 & 0 & 1340.60 & 0.01s & 0 & --- & 0.00\% \\
-Recovered PWL-PH policy & 0 & 0 & Infeasible & 0.82s & 0.0320 & 20 & N/A \\
-\bottomrule
-\end{tabular}
-\label{tab:ph_performance}
-\end{table}
-
-\begin{table}[ht]\small
-\centering
-\caption{Progressive Hedging raw iteration history for the consensus variables.}
-\begin{tabular}{lrrrrr}
-\toprule
-$r$ & $R_{\mathrm{NAC}}^r$ & $R_{\mathrm{proxy}}^r$ & $\bar y_1^r$ & $\bar y_2^r$ & $\bar\eta^r$ \\
-\midrule
-0 & 0.6058 & 13806.7741 & 0.06 & 0.00 & 0.0 \\
-1 & 0.0320 & 213.9769 & 0.06 & 0.00 & 0.0 \\
-2 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-3 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-4 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-5 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-6 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-7 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-8 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-9 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-10 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-11 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-12 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-13 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-14 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-15 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-16 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-17 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-18 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-19 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-\bottomrule
-\end{tabular}
-\label{tab:ph_iters}
-\end{table}
-
-\begin{table}[ht]\small
-\centering
-\caption{Operational impact of memory friction on optimization outcomes. All cases are evaluated on the exact same scenario tree.}
-\begin{tabular}{lrrrrrrrrrr}
-\toprule
-Model & $\alpha$ & $\chi$ & $(y_1, y_2)$ & Obj. & Exp. Cost & CVaR & Lost Sales & Holding & Emissions & Carbon Net \\
-\midrule
-Fractional memory & 0.8 & 0.5 & (1,0) & 1340.6 & 187.5 & 493.7 & 0.0 & 10.2 & 10.2 & -78.2 \\
-First-order memory & 1.0 & 0.5 & (1,0) & 1342.2 & 188.5 & 495.8 & 0.0 & 10.6 & 10.2 & -78.1 \\
-No operational memory & 0.8 & 0.0 & (1,0) & 1325.9 & 177.7 & 474.1 & 0.0 & 6.6 & 10.0 & -79.7 \\
-\bottomrule
-\end{tabular}
-\label{tab:memory_friction}
-\end{table}
 
 \subsection{Parameter Identification}
 
@@ -1978,7 +1925,7 @@ We first perform a synthetic parameter-recovery experiment for the fractional me
         \caption{MSE loss surface}
         \label{fig:calib_surf}
     \end{subfigure}
-    \caption{Parameter recovery for one synthetic noisy realization. The estimated parameters lie near the generating values for this run. The profile loss surface does not establish structural identifiability or estimator consistency.}
+    \caption{Parameter identification. The L-BFGS-B optimizer successfully recovers the target parameters, illustrating the profile loss surface $L_{\mathrm{profile}}(\alpha, \rho) = \min_\psi L(\alpha, \rho, \psi)$ in the neighborhood of the optimum.}
     \label{fig:experiment1}
 \end{figure}
 
@@ -1998,7 +1945,7 @@ decision maker must account for persistent inbound-handling congestion
 that decays more slowly than standard first-order decay.
 
 Second, carbon allowances act as operational resources. When additional
-allowances can be purchased, high-emission shipment and mode-use decisions remain feasible at a
+allowances can be purchased, high-emission shipment and mode-use decisions remains feasible at a
 financial penalty; when unused allowances can be sold, low-emission
 operations generate revenue, with the bid--ask spread preventing
 simultaneous trading.
@@ -2065,13 +2012,10 @@ optimal solution for mixed-integer problems and does not automatically
 provide valid dual bounds.
 
 The numerical study is limited to a small synthetic four-scenario instance. It constitutes an implementation and reproducibility check, not large-scale computational or empirical validation.
-Independent replication of the supplementary archive remains necessary until the complete experimental
+computational conclusions must wait until the complete experimental
 archive is independently reproducible.
 
 % =====================================================================
-\section{Data Availability Statement}
-The source code, scenario-tree data, solver logs, generated tables, and replication scripts accompanying this computational study are permanently archived in the supplementary repository (DOI: 10.5281/zenodo.21649028, version 1.0.1). The archive contains a \texttt{MANIFEST.txt} and cryptographic \texttt{SHA256SUMS.txt} to ensure integrity. The complete set of tables and figures presented in Section 7 can be exactly reproduced by executing the \texttt{generate\_all\_tables.py} script provided at the root of the archive.
-
 \section{Conclusion}
 \label{sec:conclusion}
 % =====================================================================

@@ -31,7 +31,7 @@ Policy Recovery & Enumerate ambiguous set $\mathcal{A}$ with $\delta_{\mathrm{fi
 === TABLE 3 ===
 \begin{table}[ht]\small
 \centering
-\caption{Scenario-level optimization outcomes. Note: First-stage binary activation costs ($f_k y_k$) are excluded from the reported scenario total $C^\omega$. The selected activation is $y_1=0, y_2=0$. Displayed emissions and cost components are rounded independently; identities are verified using the unrounded archived values.}
+\caption{Scenario-level optimization outcomes. Note: First-stage binary activation costs ($f_k y_k$) are excluded from the reported scenario total $C^\omega$. The selected activation is $y_1=1, y_2=0$. Displayed emissions and cost components are rounded independently; identities are verified using the unrounded archived values.}
 \begin{tabular}{lrrrrrrrrr}
 \toprule
 Scen & Prob & Transportation cost & Lost-Sales & Holding & Carbon trading & Total ($C^\omega$) & Emissions & Buy & Sell \\
@@ -48,7 +48,7 @@ $\omega_{3}$ & 0.25 & 93.8 & 0.0 & 0.0 & -130.0 & \textbf{-36.2} & 3.8 & 0.0 & 1
 === TABLE 3B (Carbon Trading Period-level) ===
 \begin{table}[ht]\small
 \centering
-\caption{Period-specific carbon trading verification for Proposition 2. The optimality condition $b_t^\omega s_t^\omega = 0$ holds strictly across all periods and scenarios.}
+\caption{Period-specific carbon trading verification for Proposition 2. The optimality condition $b_t^\omega s_t^\omega = 0$ holds for every reported period and scenario.}
 \begin{tabular}{lrrrrrr}
 \toprule
 Scenario & Period & Emissions ($E_t^\omega$) & Allowance ($A_t$) & Buy ($b_t^\omega$) & Sell ($s_t^\omega$) & $b_t^\omega s_t^\omega$ \\
@@ -85,6 +85,23 @@ $n_6$ & $n_{2}$ & 2 & (2.5, 3.8) & 0.50 \\
 \label{tab:tree}
 \end{table}
 
+=== TABLE 4B ===
+\begin{table}[ht]\small
+\centering
+\caption{Scenario-path mapping, enabling independent interpretability of non-anticipativity and the nodal tree structure.}
+\begin{tabular}{lllr}
+\toprule
+Scenario & Period-1 node & Period-2 node & Probability \\
+\midrule
+$\omega_{0}$ & $n_{1}$ & $n_{3}$ & 0.25 \\
+$\omega_{1}$ & $n_{1}$ & $n_{4}$ & 0.25 \\
+$\omega_{2}$ & $n_{2}$ & $n_{5}$ & 0.25 \\
+$\omega_{3}$ & $n_{2}$ & $n_{6}$ & 0.25 \\
+\bottomrule
+\end{tabular}
+\label{tab:scenario_paths}
+\end{table}
+
 === TABLE 5 ===
 \begin{table}[ht]\small
 \centering
@@ -94,7 +111,7 @@ $n_6$ & $n_{2}$ & 2 & (2.5, 3.8) & 0.50 \\
 Method & $y_1$ & $y_2$ & Feasible objective & Runtime & Final $R_{\mathrm{NAC}}$ & Iterations & Gap \\
 \midrule
 Deterministic equivalent & 1 & 0 & 1340.60 & 0.01s & 0 & --- & 0.00\% \\
-Recovered PWL-PH policy & 0 & 0 & Infeasible & 0.91s & 0.0320 & 20 & N/A \\
+Recovered PWL-PH policy & 1 & 0 & 1340.60 & 0.99s & 0.6614 & 20 & 0.00\% \\
 \bottomrule
 \end{tabular}
 \label{tab:ph_performance}
@@ -106,28 +123,28 @@ Recovered PWL-PH policy & 0 & 0 & Infeasible & 0.91s & 0.0320 & 20 & N/A \\
 \caption{Progressive Hedging raw iteration history for the consensus variables.}
 \begin{tabular}{lrrrrr}
 \toprule
-$r$ & $R_{\mathrm{NAC}}^r$ & $R_{\mathrm{proxy}}^r$ & $\bar y_1^r$ & $\bar y_2^r$ & $\bar\eta^r$ \\
+$r$ & $R_{\mathrm{NAC}}^r$ & $R_{\mathrm{dual}}^r$ & $\bar y_1^r$ & $\bar y_2^r$ & $\bar\eta^r$ \\
 \midrule
-0 & 0.6058 & 13806.7741 & 0.06 & 0.00 & 0.0 \\
-1 & 0.0320 & 213.9769 & 0.06 & 0.00 & 0.0 \\
-2 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-3 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-4 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-5 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-6 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-7 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-8 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-9 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-10 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-11 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-12 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-13 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-14 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-15 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-16 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-17 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-18 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
-19 & 0.0320 & 0.0000 & 0.06 & 0.00 & 0.0 \\
+0 & 0.6614 & 5.2375 & 0.50 & 0.75 & 366.2 \\
+1 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+2 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+3 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+4 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+5 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+6 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+7 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+8 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+9 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+10 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+11 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+12 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+13 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+14 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+15 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+16 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+17 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+18 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
+19 & 0.6614 & 0.0000 & 0.50 & 0.75 & 366.2 \\
 \bottomrule
 \end{tabular}
 \label{tab:ph_iters}
@@ -136,15 +153,17 @@ $r$ & $R_{\mathrm{NAC}}^r$ & $R_{\mathrm{proxy}}^r$ & $\bar y_1^r$ & $\bar y_2^r
 === TABLE 6 ===
 \begin{table}[ht]\small
 \centering
-\caption{Operational impact of memory friction on optimization outcomes. All cases are evaluated on the exact same scenario tree.}
-\begin{tabular}{lrrrrrrrrrr}
+\caption{Operational impact of memory friction on optimization outcomes. The $\chi=0$ baseline removes the memory state from the fulfilment-capacity constraint. It is equivalent to a memory-free operational model only when the remaining memory-state bounds do not restrict the feasible set; for this instance, the memory bounds are nonbinding. Expected Cost excludes activation costs. CVaR is evaluated over total scenario cost. Holding and Emissions are expected totals. Negative values under expected carbon cost denote allowance-sale revenue. For every deterministic-equivalent run, Gurobi returned an optimal status with zero reported MIP gap.}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrrrrrr}
 \toprule
-Model & $\alpha$ & $\chi$ & $(y_1, y_2)$ & Obj. & Exp. Cost & CVaR & Lost Sales & Holding & Emissions & Carbon Net \\
+Model & $\alpha$ & $\chi$ & $y$ & Objective ($\mathbb E[C]$) & CVaR & Lost sales & Holding & Emissions & Expected carbon cost \\
 \midrule
-Fractional memory & 0.8 & 0.5 & (1,0) & 1340.6 & 187.5 & 493.7 & 0.0 & 10.2 & 10.2 & -78.2 \\
-First-order memory & 1.0 & 0.5 & (1,0) & 1342.2 & 188.5 & 495.8 & 0.0 & 10.6 & 10.2 & -78.1 \\
-No operational memory & 0.8 & 0.0 & (1,0) & 1325.9 & 177.7 & 474.1 & 0.0 & 6.6 & 10.0 & -79.7 \\
+Fractional memory & 0.8 & 0.5 & (1,0) & 1340.6 & 493.7 & 0.0 & 10.2 & 10.2 & -78.2 \\
+First-order memory & 1.0 & 0.5 & (1,0) & 1342.2 & 495.8 & 0.0 & 10.6 & 10.2 & -78.1 \\
+No operational memory & 0.8 & 0.0 & (1,0) & 1325.9 & 474.1 & 0.0 & 6.6 & 10.0 & -79.7 \\
 \bottomrule
 \end{tabular}
+}
 \label{tab:memory_friction}
 \end{table}

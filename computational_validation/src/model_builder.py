@@ -171,9 +171,7 @@ def build_scenario_subproblem(omega_dict, params: TransportationModelParams,
                               rho_PH):
     model = pulp.LpProblem(f"Fractional_PH_Subproblem_{omega_dict['omega']}", pulp.LpMinimize)
     
-    y = pulp.LpVariable.dicts("y", params.K, lowBound=0, upBound=1)
-    for k in params.K:
-        y[k].cat = pulp.LpBinary
+    y = pulp.LpVariable.dicts("y", params.K, cat=pulp.LpBinary)
         
     path = omega_dict['path']
     nodes = [n.node_id for n in path]

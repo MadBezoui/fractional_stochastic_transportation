@@ -23,21 +23,31 @@ de_eta = pulp.value(eta_de)
 
 # Run PH
 start = time.time()
-y_hat, eta_bar, history = run_progressive_hedging(tree, params, rho_PH=500.0, epsilon=1e-2, max_iter=20)
+y_hat, eta_bar, history = run_progressive_hedging(tree, params, rho_PH=1.0, epsilon=1e-2, max_iter=20)
 ph_time = time.time() - start
 ph_iters = len(history)
 rnac_final = history[-1]['r_nac']
 
 # Write ph_history.csv
 os.makedirs('computational_validation/results', exist_ok=True)
+# Add assertion for correctness
+for h in history:
+    for k in params.K:
+        y_bar_calc = sum(tree.scenarios[i]['prob'] * h['y_omega'][tree.scenarios[i]['omega']][k] for i in range(len(tree.scenarios)))
+        assert abs(h['y_bar'][k] - y_bar_calc) <= 1e-8, f"Consensus mismatch for y_{k} at iter {h['iteration']}"
+        
 with open('computational_validation/results/ph_history.csv', 'w', newline='') as f:
     writer = csv.writer(f)
-    writer.writerow(['Iteration', 'R_NAC', 'R_proxy', 'y_1_bar', 'y_2_bar', 'eta_bar'])
+    headers = ['Iteration', 'R_NAC', 'R_dual', 'y_1_bar', 'y_2_bar', 'eta_bar']
+    for s in tree.scenarios:
+        headers.extend([f"y1_w{s['omega']}", f"y2_w{s['omega']}", f"eta_w{s['omega']}"])
+    writer.writerow(headers)
     for h in history:
-        writer.writerow([
-            h['iteration'], h['r_nac'], h['r_proxy'],
-            h['y_bar'][1], h['y_bar'][2], h['eta_bar']
-        ])
+        row = [h['iteration'], h['r_nac'], h['r_proxy'], h['y_bar'][1], h['y_bar'][2], h['eta_bar']]
+        for s in tree.scenarios:
+            omega = s['omega']
+            row.extend([h['y_omega'][omega][1], h['y_omega'][omega][2], h['eta_omega'][omega]])
+        writer.writerow(row)
 
 # Evaluate PH candidate
 model_eval, y_eval, *_ = build_deterministic_equivalent(tree, params)
@@ -111,7 +121,7 @@ Scen & Prob & Transportation cost & Lost-Sales & Holding & Carbon trading & Tota
     f.write("\n=== TABLE 3B (Carbon Trading Period-level) ===\n")
     f.write(r"""\begin{table}[ht]\small
 \centering
-\caption{Period-specific carbon trading verification for Proposition 2. The optimality condition $b_t^\omega s_t^\omega = 0$ holds strictly across all periods and scenarios.}
+\caption{Period-specific carbon trading verification for Proposition 2. The optimality condition $b_t^\omega s_t^\omega = 0$ holds for every reported period and scenario.}
 \begin{tabular}{lrrrrrr}
 \toprule
 Scenario & Period & Emissions ($E_t^\omega$) & Allowance ($A_t$) & Buy ($b_t^\omega$) & Sell ($s_t^\omega$) & $b_t^\omega s_t^\omega$ \\
@@ -158,6 +168,29 @@ Node & Parent & Period & Demand vector ($d_1, d_2$) & Cond. Prob. \\
 \end{table}
 """)
 
+    # Table 4B
+    f.write("\n=== TABLE 4B ===\n")
+    f.write(r"""\begin{table}[ht]\small
+\centering
+\caption{Scenario-path mapping, enabling independent interpretability of non-anticipativity and the nodal tree structure.}
+\begin{tabular}{lllr}
+\toprule
+Scenario & Period-1 node & Period-2 node & Probability \\
+\midrule
+""")
+    for sc in tree.scenarios:
+        omega = sc['omega']
+        prob = sc['prob']
+        nodes = sc['path']
+        n1 = nodes[1].node_id
+        n2 = nodes[2].node_id
+        f.write(f"$\\omega_{{{omega}}}$ & $n_{{{n1}}}$ & $n_{{{n2}}}$ & {prob:.2f} \\\\\n")
+    f.write(r"""\bottomrule
+\end{tabular}
+\label{tab:scenario_paths}
+\end{table}
+""")
+
     # Table 5
     if ph_obj is None:
         ph_obj_str = "Infeasible"
@@ -196,7 +229,7 @@ Recovered PWL-PH policy & %d & %d & %s & %.2fs & %.4f & %d & %s \\
 \caption{Progressive Hedging raw iteration history for the consensus variables.}
 \begin{tabular}{lrrrrr}
 \toprule
-$r$ & $R_{\mathrm{NAC}}^r$ & $R_{\mathrm{proxy}}^r$ & $\bar y_1^r$ & $\bar y_2^r$ & $\bar\eta^r$ \\
+$r$ & $R_{\mathrm{NAC}}^r$ & $R_{\mathrm{dual}}^r$ & $\bar y_1^r$ & $\bar y_2^r$ & $\bar\eta^r$ \\
 \midrule
 """)
     for h in history:
@@ -237,21 +270,23 @@ $r$ & $R_{\mathrm{NAC}}^r$ & $R_{\mathrm{proxy}}^r$ & $\bar y_1^r$ & $\bar y_2^r
     f.write("\n=== TABLE 6 ===\n")
     f.write(r"""\begin{table}[ht]\small
 \centering
-\caption{Operational impact of memory friction on optimization outcomes. All cases are evaluated on the exact same scenario tree.}
-\begin{tabular}{lrrrrrrrrrr}
+\caption{Operational impact of memory friction on optimization outcomes. The $\chi=0$ baseline removes the memory state from the fulfilment-capacity constraint. It is equivalent to a memory-free operational model only when the remaining memory-state bounds do not restrict the feasible set; for this instance, the memory bounds are nonbinding. Expected Cost excludes activation costs. CVaR is evaluated over total scenario cost. Holding and Emissions are expected totals. Negative values under expected carbon cost denote allowance-sale revenue. For every deterministic-equivalent run, Gurobi returned an optimal status with zero reported MIP gap.}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrrrrrr}
 \toprule
-Model & $\alpha$ & $\chi$ & $(y_1, y_2)$ & Obj. & Exp. Cost & CVaR & Lost Sales & Holding & Emissions & Carbon Net \\
+Model & $\alpha$ & $\chi$ & $y$ & Objective ($\mathbb E[C]$) & CVaR & Lost sales & Holding & Emissions & Expected carbon cost \\
 \midrule
 """)
     y1, o1, ec1, cv1, ls1, h1, e1, c1 = solve_memory(0.8, 0.5)
     y2, o2, ec2, cv2, ls2, h2, e2, c2 = solve_memory(1.0, 0.5)
     y3, o3, ec3, cv3, ls3, h3, e3, c3 = solve_memory(0.8, 0.0) # chi=0
 
-    f.write(f"Fractional memory & 0.8 & 0.5 & {y1} & {o1:.1f} & {ec1:.1f} & {cv1:.1f} & {ls1:.1f} & {h1:.1f} & {e1:.1f} & {c1:.1f} \\\\\n")
-    f.write(f"First-order memory & 1.0 & 0.5 & {y2} & {o2:.1f} & {ec2:.1f} & {cv2:.1f} & {ls2:.1f} & {h2:.1f} & {e2:.1f} & {c2:.1f} \\\\\n")
-    f.write(f"No operational memory & 0.8 & 0.0 & {y3} & {o3:.1f} & {ec3:.1f} & {cv3:.1f} & {ls3:.1f} & {h3:.1f} & {e3:.1f} & {c3:.1f} \\\\\n")
+    f.write(f"Fractional memory & 0.8 & 0.5 & {y1} & {o1:.1f} & {cv1:.1f} & {ls1:.1f} & {h1:.1f} & {e1:.1f} & {c1:.1f} \\\\\n")
+    f.write(f"First-order memory & 1.0 & 0.5 & {y2} & {o2:.1f} & {cv2:.1f} & {ls2:.1f} & {h2:.1f} & {e2:.1f} & {c2:.1f} \\\\\n")
+    f.write(f"No operational memory & 0.8 & 0.0 & {y3} & {o3:.1f} & {cv3:.1f} & {ls3:.1f} & {h3:.1f} & {e3:.1f} & {c3:.1f} \\\\\n")
     f.write(r"""\bottomrule
 \end{tabular}
+}
 \label{tab:memory_friction}
 \end{table}
 """)

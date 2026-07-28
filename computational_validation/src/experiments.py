@@ -180,7 +180,7 @@ def experiment_3_ph():
     
     # 2. Run PH
     print("Running PH Algorithm...")
-    y_hat, eta_bar, history = run_progressive_hedging(tree, params, rho_PH=500.0, epsilon=1e-2, max_iter=20)
+    y_hat, eta_bar, history = run_progressive_hedging(tree, params, rho_PH=1.0, epsilon=1e-2, max_iter=20)
     
     print(f"PH Converged in {len(history)} iterations.")
     print(f"PH Recovered y: {y_hat}")
@@ -262,7 +262,7 @@ def experiment_3_ph():
     plt.figure(figsize=(6, 4))
     plt.bar(range(len(scen_costs)), scen_costs, color='steelblue')
     plt.xlabel('Scenario $\\omega$')
-    plt.ylabel('Operational Cost $C^\\omega$')
+    plt.ylabel('Total scenario operating cost ($C^\\omega$)')
     plt.title('Scenario Cost Distribution')
     plt.xticks(range(len(scen_costs)))
     plt.grid(axis='y', linestyle=':', alpha=0.7)
@@ -278,7 +278,7 @@ def experiment_3_ph():
             bars[idx].set_color('crimson')
     plt.axhline(0, color='k', linewidth=1)
     plt.xlabel('Scenario $\\omega$')
-    plt.ylabel('Net Allowances (Bought - Sold)')
+    plt.ylabel('Net allowance purchases ($b^\\omega - s^\\omega$)')
     plt.title('Carbon Trading Position per Scenario')
     plt.xticks(range(len(scen_net_carbon)))
     plt.grid(axis='y', linestyle=':', alpha=0.7)
