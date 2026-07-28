@@ -46,8 +46,6 @@ for k in params.K:
     y_eval[k].fixValue()
 model_eval.solve(pulp.GUROBI(msg=False))
 ph_obj = pulp.value(model_eval.objective)
-# Fix the gap calculation!
-gap = (ph_obj - de_obj) / max(1, abs(de_obj)) * 100
 
 with open("manuscript/tables_output.txt", "w") as f:
     # Table 2
@@ -161,22 +159,35 @@ Node & Parent & Period & Demand vector ($d_1, d_2$) & Cond. Prob. \\
 """)
 
     # Table 5
+    if ph_obj is None:
+        ph_obj_str = "Infeasible"
+        gap_str = "N/A"
+    else:
+        ph_obj_str = f"{ph_obj:.2f}"
+        gap = (ph_obj - de_obj) / max(1, abs(de_obj)) * 100
+        gap_str = f"{gap:.2f}\\%"
+        
+    ph_rnac = history[-1]['r_nac']
+    ph_iters = history[-1]['iteration'] + 1
+    
     f.write("\n=== TABLE 5 ===\n")
     f.write(r"""\begin{table}[ht]\small
 \centering
 \caption{Performance comparison: Deterministic Equivalent (DE) versus Approximate Progressive Hedging (PWL-PH).}
 \begin{tabular}{lrrrrrrr}
 \toprule
-Method & $y_1$ & $y_2$ & Feasible objective & Runtime (s) & $R_{\mathrm{NAC}}$ & Iters & Gap \\
+Method & $y_1$ & $y_2$ & Feasible objective & Runtime & Final $R_{\mathrm{NAC}}$ & Iterations & Gap \\
 \midrule
-""")
-    f.write(f"Deterministic Equivalent & {de_y[0]} & {de_y[1]} & {de_obj:.1f} & {de_time:.2f} & 0 & --- & 0.00\\% \\\\\n")
-    f.write(f"Recovered PWL-PH policy & {y_hat[1]} & {y_hat[2]} & {ph_obj:.1f} & {ph_time:.2f} & {rnac_final:.4f} & {ph_iters} & {gap:.2f}\\% \\\\\n")
-    f.write(r"""\bottomrule
+Deterministic equivalent & %d & %d & %.2f & %.2fs & 0 & --- & 0.00\%% \\
+Recovered PWL-PH policy & %d & %d & %s & %.2fs & %.4f & %d & %s \\
+\bottomrule
 \end{tabular}
-\label{tab:ph_vs_de}
+\label{tab:ph_performance}
 \end{table}
-""")
+""" % (
+        de_y[0], de_y[1], de_obj, de_time,
+        y_hat[1], y_hat[2], ph_obj_str, ph_time, ph_rnac, ph_iters, gap_str
+    ))
 
     # Table 5B (Raw iteration history)
     f.write("\n=== TABLE 5B (PH Iterations) ===\n")
@@ -211,7 +222,7 @@ $r$ & $R_{\mathrm{NAC}}^r$ & $R_{\mathrm{proxy}}^r$ & $\bar y_1^r$ & $\bar y_2^r
             + sc['prob'] * (p.P_B*b[n.node_id].varValue - p.P_S*s[n.node_id].varValue)
             for sc in tree.scenarios for n in sc['path'] if n.t > 0
         )
-        cvar = eta.varValue + 1.0/(1.0 - p.lambd) * sum(sc['prob'] * xi[sc['omega']].varValue for sc in tree.scenarios)
+        cvar = eta.varValue + 1.0/(1.0 - p.beta) * sum(sc['prob'] * xi[sc['omega']].varValue for sc in tree.scenarios)
         
         ls_cost = sum(sc['prob'] * sum(p.pi[j]*u[j, n.node_id].varValue for j in p.J) for sc in tree.scenarios for n in sc['path'] if n.t > 0)
         holding = sum(sc['prob'] * sum(p.h[j]*z[j, n.node_id].varValue for j in p.J) for sc in tree.scenarios for n in sc['path'] if n.t > 0)

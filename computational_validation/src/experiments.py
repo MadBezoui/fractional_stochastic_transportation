@@ -68,7 +68,7 @@ def experiment_1_calibration():
     plt.legend()
     plt.grid(True, linestyle=':', alpha=0.7)
     plt.tight_layout()
-    plt.savefig('../../manuscript/figures/fig_calibration_trajectory.pdf')
+    plt.savefig('manuscript/figures/fig_calibration_trajectory.pdf')
     plt.close()
     
     # Plot 2: Surface
@@ -87,10 +87,10 @@ def experiment_1_calibration():
     plt.plot(alpha_est, rho_est, 'wo', markersize=8, markeredgecolor='k', label='Estimated')
     plt.xlabel('Fractional order $\\alpha$')
     plt.ylabel('Dissipation $\\rho$')
-    plt.title('MSE Loss Surface')
+    plt.title('Loss slice $L(\\alpha,\\rho,\\psi^\\star)$ at $\\psi^\\star=0.5$')
     plt.legend()
     plt.tight_layout()
-    plt.savefig('../../manuscript/figures/fig_calibration_surface.pdf')
+    plt.savefig('manuscript/figures/fig_calibration_surface.pdf')
     plt.close()
 
     return alpha_est, rho_est, psi_est
@@ -129,7 +129,7 @@ def experiment_2_baselines():
         
     plt.figure(figsize=(6, 4))
     plt.plot(F_t, label='Forcing $F_t$ (Congestion)', color='red', linestyle=':')
-    plt.plot(np.zeros(N_sim), label='No Memory ($\\chi=0$)', color='gray')
+    plt.plot(np.zeros(N_sim), label='Zero memory forcing ($\\psi=0, m_0=0$)', color='gray')
     plt.plot(m_alpha1, label='First-order ($\\alpha=1$)', color='green', linestyle='--')
     plt.plot(m_alpha08, label='Fractional ($\\alpha=0.8$)', color='blue')
     plt.xlabel('Time Step $t$')
@@ -138,7 +138,7 @@ def experiment_2_baselines():
     plt.legend()
     plt.grid(True, linestyle=':', alpha=0.7)
     plt.tight_layout()
-    plt.savefig('../../manuscript/figures/fig_memory_baselines.pdf')
+    plt.savefig('manuscript/figures/fig_memory_baselines.pdf')
     plt.close()
     
     for scen in scenarios:
@@ -195,25 +195,48 @@ def experiment_3_ph():
     model_eval.solve(pulp.GUROBI(msg=False))
     ph_cost = pulp.value(model_eval.objective)
     
-    print(f"PH Policy Cost: {ph_cost:.2f}")
-    optimality_gap = (ph_cost - true_cost) / true_cost * 100 if true_cost > 0 else 0
-    print(f"Optimality Gap: {optimality_gap:.2f}%\n")
+    if ph_cost is None:
+        print("PH Policy is infeasible.")
+    else:
+        print(f"PH Policy Cost: {ph_cost:.2f}")
+        optimality_gap = (ph_cost - true_cost) / true_cost * 100 if true_cost > 0 else 0
+        print(f"Optimality Gap: {optimality_gap:.2f}%\n")
     
+    # Save CSV
+    import csv
+    with open('computational_validation/results/ph_history.csv', 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=['iteration', 'r_nac', 'r_proxy', 'stopping_reason'])
+        writer.writeheader()
+        for h in history:
+            writer.writerow({
+                'iteration': h['iteration'],
+                'r_nac': h['r_nac'],
+                'r_proxy': h['r_proxy'],
+                'stopping_reason': h.get('stopping_reason', '')
+            })
+            
     # Plot PH Convergence
     iters = [h['iteration'] for h in history]
     rnac = [h['r_nac'] for h in history]
     
     plt.figure(figsize=(6, 4))
     plt.plot(iters, rnac, marker='s', color='purple', linewidth=2)
-    plt.axhline(1e-2, color='k', linestyle='--', label='Tolerance $\\varepsilon$')
+    plt.axhline(1e-2, color='k', linestyle='--', label='Tolerance $\\varepsilon=10^{-2}$')
+    
+    final_reason = history[-1].get('stopping_reason', 'maximum iterations')
+    plt.annotate(f"Stopped: {final_reason}\\nFinal $R_{{{'NAC'}}} = {rnac[-1]:.4f}$",
+                 xy=(iters[-1], rnac[-1]), xytext=(max(0, iters[-1]-5), rnac[-1]*2.0),
+                 arrowprops=dict(facecolor='black', shrink=0.05),
+                 fontsize=9, bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.8))
+                 
     plt.xlabel('PH Iteration $r$')
     plt.ylabel('Non-Anticipativity Residual $R_{\\mathrm{NAC}}$')
     plt.yscale('log')
-    plt.title('Progressive Hedging Convergence')
+    plt.title('PWL-PH residual history for one illustrative run')
     plt.legend()
     plt.grid(True, linestyle=':', alpha=0.7)
     plt.tight_layout()
-    plt.savefig('../../manuscript/figures/fig_ph_convergence.pdf')
+    plt.savefig('manuscript/figures/fig_ph_convergence.pdf')
     plt.close()
     
     # Extract costs and carbon for True DE
@@ -244,7 +267,7 @@ def experiment_3_ph():
     plt.xticks(range(len(scen_costs)))
     plt.grid(axis='y', linestyle=':', alpha=0.7)
     plt.tight_layout()
-    plt.savefig('../../manuscript/figures/fig_scenario_costs.pdf')
+    plt.savefig('manuscript/figures/fig_scenario_costs.pdf')
     plt.close()
     
     # Plot Carbon Trading
@@ -260,7 +283,7 @@ def experiment_3_ph():
     plt.xticks(range(len(scen_net_carbon)))
     plt.grid(axis='y', linestyle=':', alpha=0.7)
     plt.tight_layout()
-    plt.savefig('../../manuscript/figures/fig_carbon_trading.pdf')
+    plt.savefig('manuscript/figures/fig_carbon_trading.pdf')
     plt.close()
 
 if __name__ == "__main__":

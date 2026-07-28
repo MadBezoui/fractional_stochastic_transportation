@@ -1,0 +1,150 @@
+\section{Fractional stochastic transportation model}
+\subsection{Network structure and decision epochs}
+Consider a transportation system with suppliers $i\in I$, customers $j\in J$, transportation modes $k\in K$, planning periods $t\in T=\{1,\dots,N\}$, and demand scenarios $\omega\in\Omega$. Suppliers provide product availability, transportation modes represent the operational channels through which shipments move, and customers generate uncertain demand. The planning horizon is finite and discretized into equal time intervals.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=2.2cm and 1.8cm,
+    box/.style={draw, rounded corners=3pt, minimum width=2.5cm, minimum height=1cm, align=center, font=\small, fill=blue!5},
+    arr/.style={->, >=stealth, thick, color=gray!80!black},
+    label/.style={font=\footnotesize\itshape, color=black!70}
+]
+    \node[box, fill=green!10] (sup) {Suppliers ($I$)\\Capacities $S_{it}$};
+    \node[box, fill=orange!10, right=of sup] (trans) {Multimodal Links ($K$)\\Emissions $e_{ijkt}$, Cost $c_{ijkt}$};
+    \node[box, fill=blue!10, right=of trans] (cust) {Customers ($J$)\\Stochastic Demand $d_{jt}^\omega$\\Caputo Memory State $z_{jt}^\omega$};
+    \node[box, fill=purple!10, below=1.2cm of trans, minimum width=6cm] (carb) {Carbon Cap-and-Trade Market\\Allowance $A$, Buying $b^\omega$ ($p^b$), Selling $s^\omega$ ($p^s$)};
+
+    \draw[arr] (sup) to node[above, label] {Shipments $x_{ijkt}^\omega$} (trans);
+    \draw[arr] (trans) to node[above, label] {Deliveries} (cust);
+    \draw[arr, <->, dashed] (trans) to node[right, label] {Emissions vs. Allowance} (carb);
+\end{tikzpicture}
+\caption{Illustrative schematic of the multi-echelon stochastic transportation network coupled with the carbon cap-and-trade mechanism.}
+\label{fig:network_schematic}
+\end{figure}
+
+
+
+
+
+The system combines first-stage and second-stage decisions. The first stage contains decisions that must be taken before demand uncertainty is revealed, such as activating transportation modes or baseline contractual commitments. The second stage contains recourse decisions that adapt to realized demand scenarios, including scenario-dependent shipment quantities, effective inventory states, shortages, and carbon-trading quantities.
+
+\subsection{Parameters}
+The principal parameters are as follows:
+\begin{itemize}[leftmargin=1.8em]
+    \item $S_{it}$: available supply at supplier $i$ in period $t$,
+    \item $d_{jt}^{\omega}$: demand of customer $j$ in period $t$ under scenario $\omega$,
+    \item $c_{ijkt}$: unit transportation cost from supplier $i$ to customer $j$ using mode $k$ in period $t$,
+    \item $e_{ijkt}$: unit emissions factor associated with the same movement,
+    \item $Q_k$: capacity coefficient of mode $k$ when activated,
+    \item $f_k$: fixed activation cost of mode $k$,
+    \item $h_j$: unit cost associated with the effective inventory/service state at customer $j$,
+    \item $\pi_j$: unit shortage penalty at customer $j$,
+    \item $A$: initial carbon allowance endowment,
+    \item $p^b$ and $p^s$: carbon-allowance buying and selling prices, with $p^b\ge p^s\ge 0$,
+    \item $\rho_j$: dissipation or deterioration coefficient in the fractional balance equation,
+    \item $\gamma_j$: minimum service fraction required for customer $j$,
+    \item $\beta$: CVaR confidence level,
+    \item $\lambda$: weight assigned to the CVaR term in the objective.
+\end{itemize}
+
+\subsection{Decision variables}
+The first-stage binary variable is
+\begin{equation}
+ y_k=\begin{cases}
+ 1,&\text{if transportation mode }k\text{ is activated},\\
+ 0,&\text{otherwise.}
+ \end{cases}
+\end{equation}
+
+For each scenario $\omega$, the second-stage variables are:
+\begin{itemize}[leftmargin=1.8em]
+    \item $x_{ijkt}^{\omega}\ge 0$: shipment from supplier $i$ to customer $j$ through mode $k$ in period $t$,
+    \item $z_{jt}^{\omega}\ge 0$: effective inventory-service state of customer $j$ in period $t$,
+    \item $u_{jt}^{\omega}\ge 0$: shortage at customer $j$ in period $t$,
+    \item $b^{\omega}\ge 0$: carbon allowances purchased under scenario $\omega$,
+    \item $s^{\omega}\ge 0$: carbon allowances sold under scenario $\omega$,
+    \item $\eta\in\R$ and $\xi_{\omega}\ge 0$: auxiliary variables used in the CVaR linearization.
+\end{itemize}
+
+\subsection{Objective function}
+The planner minimizes a risk-adjusted expected total cost:
+\begin{align}
+\min \quad &\sum_{k\in K}f_k y_k
++\sum_{\omega\in\Omega}p_{\omega}C^{\omega}
++\lambda\left(\eta+\frac{1}{1-\beta}\sum_{\omega\in\Omega}p_{\omega}\xi_{\omega}\right),
+\end{align}
+where the scenario cost is
+\begin{equation}
+C^{\omega}=\sum_{i,j,k,t}c_{ijkt}x_{ijkt}^{\omega}
++\sum_{j,t}\left(h_j z_{jt}^{\omega}+\pi_j u_{jt}^{\omega}\right)
++p^b b^{\omega}-p^s s^{\omega}.
+\end{equation}
+
+The objective has three layers. The fixed activation term captures ex ante structural commitments. The expected scenario cost measures average operational performance. The CVaR term penalizes the tail of the cost distribution and therefore protects the system against severe shortage or expensive carbon-market exposure in adverse scenarios.
+
+\subsection{Capacity constraints}
+Supply feasibility requires
+\begin{equation}
+\sum_{j,k}x_{ijkt}^{\omega}\le S_{it},
+\qquad i\in I,\ t\in T,\ \omega\in\Omega.
+\end{equation}
+Activated transportation capacity satisfies
+\begin{equation}
+\sum_{i,j}x_{ijkt}^{\omega}\le Q_k y_k,
+\qquad k\in K,\ t\in T,\ \omega\in\Omega.
+\end{equation}
+The first constraint prevents shipping more than available supply. The second links scenario recourse to first-stage activation. If a mode is not activated, no scenario may use it.
+
+\subsection{Fractional inventory-service balance}
+The central modeling feature of the paper is the fractional state equation. For each customer $j$ under scenario $\omega$, let $z_j^{\omega}(t)$ denote the effective inventory-service state. The continuous-time balance law is
+\begin{equation}\label{eq:fracbalance}
+\cD_t^{\alpha} z_j^{\omega}(t)
+=\sum_{i,k}x_{ijk}^{\omega}(t)-d_j^{\omega}(t)-\rho_j z_j^{\omega}(t)+u_j^{\omega}(t).
+\end{equation}
+
+This equation differs from a conventional stock recursion in an important way. The current rate of change depends on a weighted history of past state increments. Operationally, the state variable may be interpreted broadly enough to include usable inventory, service recovery, congestion-adjusted availability, or other effective post-transport conditions.
+
+Using the L1 discretization on periods $n=1,\dots,N$ yields
+\begin{equation}
+\frac{1}{\Gamma(2-\alpha)\Delta t^{\alpha}}
+\sum_{r=0}^{n-1}a_{n-r-1}(z_{j,r+1}^{\omega}-z_{jr}^{\omega})
+=\sum_{i,k}x_{ijkn}^{\omega}-d_{jn}^{\omega}-\rho_j z_{jn}^{\omega}+u_{jn}^{\omega},
+\end{equation}
+where $a_r=(r+1)^{1-\alpha}-r^{1-\alpha}$. This expression makes explicit that each period is coupled to the entire preceding state trajectory.
+
+The scaling factor $\Delta t^{\alpha}/\Gamma(2-\alpha)$ is not a cosmetic normalization. It is the term that maps the fractional derivative to a finite-period increment on the discrete grid. In dimensional terms, if $z$ is an effective stock or service state, then $\cD_t^{\alpha} z$ has units of state divided by time$^{\alpha}$. Multiplying by $\Delta t^{\alpha}$ therefore restores a quantity with the units of the state increment. This is important for interpretability because the right-hand side combines shipment, demand, dissipation, and shortage terms over one planning interval.
+
+The dissipation coefficient $\rho_j$ should likewise be interpreted relative to the fractional dynamics rather than by direct analogy with a standard first-order decay rate. It measures how strongly the current effective state is pulled downward within the fractional balance law, representing phenomena such as congestion persistence, quality deterioration, backlog carry-over, or slow recovery. In empirical applications, $\rho_j$ should therefore be calibrated jointly with $\alpha$, since the same observed persistence pattern may be explained differently depending on the strength of memory.
+
+As $\alpha\to 1^{-}$, the L1 discretization converges to the usual backward-difference representation of a first-order balance equation. Hence the fractional formulation is backward compatible with the classical memoryless model, and the case $\alpha=1$ serves as a natural benchmark in the computational study.
+
+\subsection{Carbon-emissions accounting and trading}
+Scenario emissions are defined by
+\begin{equation}
+E^{\omega}=\sum_{i,j,k,t}e_{ijkt}x_{ijkt}^{\omega}.
+\end{equation}
+Carbon-market feasibility requires
+\begin{equation}
+E^{\omega}\le A+b^{\omega}-s^{\omega},
+\qquad \omega\in\Omega.
+\end{equation}
+Thus the planner may either adapt operationally to stay within the initial allowance or buy additional allowances when operational needs justify higher emissions. If emissions are sufficiently low, the planner may sell excess allowances.
+
+\subsection{Service requirement}
+To avoid trivial solutions that simply accept large shortages, a service guarantee is imposed:
+\begin{equation}
+\sum_t u_{jt}^{\omega}\le (1-\gamma_j)\sum_t d_{jt}^{\omega},
+\qquad j\in J,\ \omega\in\Omega.
+\end{equation}
+This ensures that shortage remains bounded relative to demand. The service threshold $\gamma_j$ can vary across customer classes if desired.
+
+\subsection{CVaR linearization constraints}
+The tail-risk term is linearized through
+\begin{equation}
+\xi_{\omega}\ge C^{\omega}-\eta,
+\qquad \xi_{\omega}\ge 0,
+\qquad \omega\in\Omega.
+\end{equation}
+This is the standard Rockafellar-Uryasev representation. It allows the optimization model to penalize the tail of the scenario-cost distribution without losing tractability.
+

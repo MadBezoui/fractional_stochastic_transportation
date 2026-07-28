@@ -1,0 +1,33 @@
+\section{Scenario-generation protocol}
+This appendix documents the logic used to generate the benchmark scenarios. The objective is not to replicate a specific industrial dataset but to define a reproducible synthetic environment consistent with the model assumptions.
+
+\subsection{Continuous-time demand representation}
+For each customer $j$, demand is generated from a drift--diffusion process of the form
+\begin{equation}
+ dD_j(t)=\mu_j(t)\,dt+\sigma_j(t)\,dW_j(t),
+\end{equation}
+where the drift component captures trend and the volatility term captures random fluctuations. In the benchmark design, the drift is allowed to vary moderately across customers to reflect heterogeneous market growth rates.
+
+\subsection{Discretization}
+On the planning grid $t_n=n\Delta t$, the process is discretized through an Euler-type scheme,
+\begin{equation}
+ D_{j,n+1}=D_{j,n}+\mu_{j,n}\Delta t+\sigma_{j,n}\sqrt{\Delta t}\,\varepsilon_{j,n},
+\end{equation}
+where $\varepsilon_{j,n}$ are standard normal innovations. Cross-customer correlation can be incorporated through a Cholesky factorization of the innovation covariance matrix. In the benchmark, moderate positive dependence is introduced to emulate common market shocks.
+
+\subsection{Volatility scaling}
+To study sensitivity, the volatility coefficients are multiplied by a scalar factor $\nu\in\{0.50,0.75,1.00,1.25,1.50\}$. This creates nested families of demand trajectories with increasing uncertainty while preserving the same drift structure. The resulting scenarios are therefore comparable in a controlled way.
+
+\subsection{Training and validation samples}
+For each parameter regime, two independent samples are used:
+\begin{itemize}[leftmargin=1.8em]
+    \item a training sample used to solve the SAA problem;
+    \item an independent validation sample used to evaluate the recovered policy out of sample.
+\end{itemize}
+This split is important because a finite scenario sample can lead to optimistic in-sample results. Validation therefore functions as a guard against overfitting.
+
+\subsection{Interpretation of synthetic scenarios}
+The benchmark scenarios should be interpreted as controlled stress patterns rather than forecasts of a single real system. Their purpose is to reveal how the optimization model reacts when uncertainty, memory, and carbon constraints interact. In later empirical work, the same protocol can be replaced by historical residual resampling, parametric bootstrap, or forecast-distribution sampling from a predictive model.
+
+\subsection{Why a synthetic benchmark is still useful}
+Methodological papers often face a trade-off between realism and transparency. A proprietary case study may be realistic but difficult to reproduce. A synthetic benchmark may be less realistic but easier to audit and extend. The present paper adopts the second path deliberately. By making the scenario logic explicit, the manuscript allows later researchers to replace only the data layer while preserving the full fractional stochastic optimization architecture.

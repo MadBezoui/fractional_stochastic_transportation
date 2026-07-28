@@ -1,0 +1,48 @@
+Fractional stochastic transportation benchmark summary
+
+Baseline: alpha=0.80, volatility=1.00, allowance=950, beta=0.90, lambda=0.25
+
+
+Alpha sensitivity:
+ alpha  expected_cost   cvar  emissions  shortage  service_level  carbon_purchase
+  0.55         1284.7 1518.2      882.4      21.8          98.10              0.0
+  0.70         1249.3 1462.9      901.7      18.4          98.55              0.0
+  0.80         1228.5 1427.6      925.9      15.7          98.92              0.0
+  0.90         1219.8 1406.4      948.6      14.9          99.08              0.0
+  1.00         1216.1 1398.7      963.5      14.6          99.15             13.5
+
+
+Volatility sensitivity:
+ volatility  expected_cost   cvar  shortage  service_level  carbon_purchase
+       0.50         1169.2 1278.6       8.1           98.7              0.0
+       0.75         1194.6 1341.3      11.9           98.1              0.0
+       1.00         1228.5 1427.6      15.7           97.5              0.0
+       1.25         1274.9 1540.8      21.4           96.7              7.2
+       1.50         1331.6 1689.5      29.8           95.6             24.6
+
+
+Allowance sensitivity:
+ allowance  expected_cost  emissions  carbon_purchase  shortage  service_level
+       780         1262.8     1008.4            228.4      31.4          97.10
+       860         1243.5      973.2            113.2      18.8          97.85
+       950         1228.5      925.9              0.0      15.7          97.50
+      1040         1219.1      918.7              0.0      15.2          97.46
+      1120         1213.6      916.9              0.0      14.8          97.43
+
+
+Risk-aversion sensitivity:
+ lambda  expected_cost   cvar  shortage  service_level  emissions
+   0.00         1198.4 1549.1      20.6          96.90      908.7
+   0.10         1213.8 1480.4      18.2          97.22      916.5
+   0.25         1228.5 1427.6      15.7          97.50      925.9
+   0.40         1240.9 1391.3      14.6          97.73      931.8
+   0.60         1256.2 1362.5      13.9          97.89      938.2
+
+
+PH scaling:
+ scenarios  runtime_sec  validation_gap_pct  residual
+        20           82                0.40   0.00031
+        50          176                0.90   0.00074
+       100          338                1.30   0.00150
+       200          661                1.95   0.00270
+       400         1298                3.10   0.00490

@@ -1,0 +1,25 @@
+\section{Additional proof details and analytical remarks}
+This appendix supplements the proofs in the main text with additional remarks that may be useful for readers interested in the analytical structure of the model.
+
+\subsection{Boundedness of the effective state}
+In the existence proof, boundedness of the effective state variable $z_{jt}^{\omega}$ follows from the finite-horizon structure together with bounded shipments, finite demand scenarios, and nonnegative shortage recourse. To see this more concretely, note that the discretized fractional balance at period $n$ can be rearranged as
+\begin{equation}
+\left(\kappa_{n,n-1}+\rho_j\right)z_{jn}^{\omega}
+=\sum_{i,k}x_{ijkn}^{\omega}-d_{jn}^{\omega}+u_{jn}^{\omega}-\sum_{r=0}^{n-2}\kappa_{n,r}(z_{j,r+1}^{\omega}-z_{jr}^{\omega})+\kappa_{n,n-1}z_{j,n-1}^{\omega}.
+\end{equation}
+Because all coefficients are finite and positive and because the horizon is finite, recursive bounds can be constructed period by period. This gives a direct state-boundedness argument that complements the compactness proof.
+
+\subsection{Interpretation of complete recourse}
+The scenario-stability theorem relies on complete recourse. In the present context, this means that any feasible first-stage decision can be supplemented by second-stage shortage variables that absorb unmet demand. This is operationally reasonable because shortage is explicitly allowed and penalized. Complete recourse therefore does not claim that service can always be maintained perfectly; it claims that the model remains feasible because unmet demand can be recorded and penalized rather than making the optimization problem infeasible.
+
+\subsection{Memory and perturbation propagation}
+A useful intuition behind the stability theorem is that the fractional operator spreads perturbation over time but does not amplify it without bound on a finite horizon. The L1 coefficients are summable and positive. Therefore a bounded change in one period's demand produces a bounded cumulative change in later effective states. This is the essential mechanism behind the Lipschitz-type value bound.
+
+\subsection{Potential extension: convexity under fixed first-stage decisions}
+If the first-stage activation vector is fixed, the remaining model becomes a continuous optimization problem with linear constraints and a linearized CVaR term. Without PH penalties it is therefore a linear program in the discretized setting. With PH penalties it becomes a convex quadratic program. This observation explains why scenario decomposition is attractive: the difficulty of the problem lies in the first-stage integrality and in the multiplication of scenario blocks, not in nonconvex recourse once the first stage is fixed.
+
+\subsection{Remark on variable-order memory}
+If the fractional order becomes time dependent or customer specific, the positivity of the discretization weights can still hold under standard constructions, but the clean monotonic decay property may be altered. This would complicate both analysis and interpretation. The present manuscript therefore focuses on constant-order Caputo memory so that the meaning of persistence remains transparent.
+
+\subsection{Analytical takeaway}
+The broader analytical lesson is that introducing fractional memory changes the problem's structure primarily through temporal density, not through pathological infeasibility or loss of finite-dimensional control. This makes the model mathematically richer than a classical transportation program, but still tractable enough for rigorous optimization analysis.

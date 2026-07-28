@@ -1,0 +1,97 @@
+\section{Theoretical properties}
+\subsection{Feasibility and compactness}
+The first point to verify is that the deterministic equivalent remains a finite-dimensional optimization problem with bounded feasible region under standard assumptions. This is not completely trivial because the fractional balance equation couples all periods and because carbon trading introduces additional recourse variables.
+
+\begin{theorem}[Existence of an optimal solution]
+Assume that the index sets $I$, $J$, $K$, $T$, and $\Omega$ are finite, supplies and capacities are bounded, all cost parameters are nonnegative, $p^b\ge p^s\ge 0$, and the feasible set is nonempty. Then the deterministic equivalent of the scenario model admits at least one optimal solution.
+\end{theorem}
+
+\begin{proof}
+Because $K$ is finite and each $y_k\in\{0,1\}$, the vector of activation decisions belongs to a finite set. Fix any feasible activation vector. Then shipment variables are bounded above by the supplier limits $S_{it}$ and by the activated mode capacities $Q_k y_k$. Hence the feasible shipment region is bounded.
+
+Consider next the discretized fractional balance equations. Since the L1 coefficients are finite and positive over the finite horizon, and since the right-hand side contains bounded shipments, finite demand scenarios, and nonnegative shortages, the effective state variables remain bounded whenever the feasible set is nonempty. Shortage variables are also bounded because the service constraints restrict cumulative shortage relative to finite demand realizations.
+
+Finally, carbon purchases and sales remain bounded. Total emissions are bounded above by the maximum feasible shipment pattern. Purchases need never exceed this maximal emissions level. Sales cannot exceed the initial allowance plus purchases while preserving carbon balance. Because all feasible variables belong to closed bounded sets and all equality/inequality constraints are continuous, the feasible region is compact. The objective function is continuous, so by the Weierstrass theorem it attains its minimum on the feasible set.
+\end{proof}
+
+The existence result provides a basic but essential foundation. It shows that the presence of fractional memory does not destroy well-posedness on a finite horizon, even though the resulting state equations are temporally dense.
+
+\subsection{Structure of the carbon-trading decision}
+A natural question is whether the planner may optimally buy and sell carbon allowances simultaneously in the same scenario. When the market has a nonzero spread, such behavior should be dominated. The following proposition formalizes that intuition.
+
+\begin{proposition}[No simultaneous buying and selling]
+If $p^b>p^s$, then for every scenario $\omega$ there exists an optimal solution satisfying
+\begin{equation}
+ b^{\omega}s^{\omega}=0.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Suppose an optimal solution has $b^{\omega}>0$ and $s^{\omega}>0$ for some scenario $\omega$. Let $\delta=\min\{b^{\omega},s^{\omega}\}>0$ and define
+\begin{equation}
+\widehat b^{\omega}=b^{\omega}-\delta,
+\qquad
+\widehat s^{\omega}=s^{\omega}-\delta.
+\end{equation}
+The net allowance position $b^{\omega}-s^{\omega}$ remains unchanged, so the carbon-balance constraint stays satisfied. All other variables are unaffected. The scenario cost decreases by
+\begin{equation}
+(p^b-p^s)\delta>0,
+\end{equation}
+which contradicts optimality. Hence no optimal solution needs simultaneous buying and selling.
+\end{proof}
+
+This result improves interpretability and computational stability. It implies that the allowance market behaves as a one-sided recourse mechanism in each scenario once prices are properly ordered.
+
+\subsection{Monotonicity with respect to shortage penalties}
+The shortage penalty is one of the key managerial parameters in the model. Larger values should reduce optimal shortage, although the precise structural effect depends on capacities and carbon regulation. The following proposition states a weak monotonicity property.
+
+\begin{proposition}[Weak monotonicity in shortage penalty]
+Let $\pi_j$ and $\widetilde\pi_j$ be two shortage-penalty vectors such that $\widetilde\pi_j\ge \pi_j$ for every customer $j$. Denote the corresponding optimal values by $V(\pi)$ and $V(\widetilde\pi)$. Then
+\begin{equation}
+V(\widetilde\pi)\ge V(\pi).
+\end{equation}
+Moreover, any optimal policy under $\widetilde\pi$ cannot have strictly larger shortage cost contribution than an identical policy under $\pi$.
+\end{proposition}
+
+\begin{proof}
+For any fixed feasible policy, increasing shortage penalties cannot reduce its objective value because all other terms remain unchanged and shortage variables are nonnegative. Taking minima over the common feasible set gives the first inequality. The second statement follows directly from nonnegativity of shortage volumes.
+\end{proof}
+
+The proposition is elementary, but it is useful in comparative statics. It confirms that shortage penalties behave consistently with their intended service-protection role.
+
+\subsection{Scenario stability under demand perturbations}
+A second theoretical concern is robustness with respect to small changes in the scenario set. In scenario-based stochastic programming, it is important to know whether moderate changes in sampled demand paths can produce disproportionate changes in the optimal value. Here, however, one qualification is essential. Because the model includes service requirements and capacity restrictions, the relevant stability statement is not unconditional. It requires a strong form of complete recourse, namely that perturbations in demand can still be absorbed feasibly through the shortage variables without violating the imposed service floors. The following theorem should therefore be read as a conditional value-stability result rather than as a blanket property of every parameter regime.
+
+\begin{theorem}[Scenario stability]
+Let two demand scenario sets differ by at most $\varepsilon$ in the uniform norm. Assume complete recourse and let $\bar\pi=\max_j \pi_j$. Then the corresponding optimal values $V$ and $\widetilde V$ satisfy
+\begin{equation}
+|V-\widetilde V|\le L\varepsilon,
+\end{equation}
+where $L$ is a finite constant depending on $\bar\pi$, the horizon length, and the L1 fractional weights.
+\end{theorem}
+
+\begin{proof}
+Fix any feasible first-stage policy and consider the induced second-stage problems under the two scenario sets. A perturbation in demand enters linearly on the right-hand side of the discretized fractional balance constraints. Under complete recourse, any additional unmet demand can be absorbed through shortage variables, so the recourse problem remains feasible. The direct increase in cost is bounded by the shortage penalty multiplied by the magnitude of the demand perturbation after propagation through the fractional balance system.
+
+The L1 coefficients are positive, finite, and summable over the finite horizon. Therefore the cumulative effect of an $\varepsilon$ perturbation is bounded by a constant multiple of $\varepsilon$. Taking expectation over the finite scenario set preserves this bound. Applying the same argument in both directions yields the absolute-value inequality.
+\end{proof}
+
+The theorem does not claim that the optimal policy itself changes continuously in a strong sense. Instead, it states that the value function is stable with respect to moderate scenario perturbations under the stated complete-recourse condition. This qualifier is important in the present model: if service floors are too tight relative to available capacity, or if shortage is not sufficient to restore feasibility, the bound need not hold. The result should therefore be interpreted as a conditional regularity statement for well-buffered regimes, not as a universal theorem covering every possible parameterization.
+
+\subsection{Interpretation of the memory term in comparative statics}
+The fractional order enters the model through the L1 coefficients and therefore changes the propagation of historical increments. It is useful to record the sign structure of these weights.
+
+\begin{lemma}[Positivity and decay of L1 coefficients]
+For $0<\alpha<1$, the coefficients
+\begin{equation}
+ a_r=(r+1)^{1-\alpha}-r^{1-\alpha}
+\end{equation}
+are strictly positive and monotonically decreasing in $r$.
+\end{lemma}
+
+\begin{proof}
+Positivity follows immediately because the function $x\mapsto x^{1-\alpha}$ is strictly increasing on $\mathbb{R}_+$. Monotonicity follows because the same function is concave for $0<1-\alpha<1$, so its forward differences decrease with $r$.
+\end{proof}
+
+This lemma explains why the memory effect is operationally interpretable. Past increments never change sign through the discretization, and their influence decays in an orderly manner with temporal distance.
+

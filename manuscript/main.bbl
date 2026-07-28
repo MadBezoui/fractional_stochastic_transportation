@@ -1,0 +1,182 @@
+\begin{thebibliography}{23}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Asghari and Mirzapour Al-e hashem(2021)]{asghari2021green}
+Mohammad Asghari and S.~Mohammad~J. Mirzapour Al-e hashem.
+\newblock Green vehicle routing problem: A state-of-the-art review.
+\newblock \emph{International Journal of Production Economics}, 231:\penalty0
+  107899, 2021.
+\newblock \doi{10.1016/j.ijpe.2020.107899}.
+
+\bibitem[Bekta{\c{s}} and Laporte(2011)]{bektas2011pollution}
+Tolga Bekta{\c{s}} and Gilbert Laporte.
+\newblock The pollution-routing problem.
+\newblock \emph{Transportation Research Part B: Methodological}, 45\penalty0
+  (8):\penalty0 1232--1250, 2011.
+\newblock \doi{10.1016/j.trb.2011.02.004}.
+
+\bibitem[Birge and Louveaux(2011)]{birge2011}
+John~R. Birge and Fran{\c{c}}ois Louveaux.
+\newblock \emph{Introduction to Stochastic Programming}.
+\newblock Springer, New York, 2nd edition, 2011.
+
+\bibitem[Caputo(1967)]{caputo1967}
+Michele Caputo.
+\newblock Linear models of dissipation whose {$Q$} is almost frequency
+  independent---{II}.
+\newblock \emph{Geophysical Journal International}, 13\penalty0 (5):\penalty0
+  529--539, 1967.
+\newblock \doi{10.1111/j.1365-246X.1967.tb02303.x}.
+
+\bibitem[Christiansen et~al.(2023)Christiansen, Dandurand, Eberhard, and
+  Oliveira]{christiansen2023ph}
+Jeffrey Christiansen, Brian Dandurand, Andrew Eberhard, and Fabricio Oliveira.
+\newblock A study of progressive hedging for stochastic integer programming.
+\newblock \emph{Computational Optimization and Applications}, 86\penalty0
+  (3):\penalty0 989--1034, 2023.
+\newblock \doi{10.1007/s10589-023-00532-w}.
+
+\bibitem[Cuong et~al.(2023)Cuong, Kim, Long, and You]{cuong2023}
+Truong~Ngoc Cuong, Hwan-Seong Kim, Le~Ngoc~Bao Long, and Sam-Sang You.
+\newblock Decision support system for managing multi-echelon supply chain
+  networks against disruptions using adaptive fractional order control
+  algorithm.
+\newblock \emph{RAIRO -- Operations Research}, 57\penalty0 (2):\penalty0
+  787--815, 2023.
+\newblock \doi{10.1051/ro/2023035}.
+
+\bibitem[Diethelm(2010)]{diethelm2010}
+Kai Diethelm.
+\newblock \emph{The Analysis of Fractional Differential Equations}.
+\newblock Springer, Berlin, 2010.
+\newblock \doi{10.1007/978-3-642-14574-2}.
+
+\bibitem[Dupa{\v{c}}ov{\'a} et~al.(2003)Dupa{\v{c}}ov{\'a}, Gr{\"o}we-Kuska,
+  and R{\"o}misch]{dupacova2003scenarios}
+Jitka Dupa{\v{c}}ov{\'a}, Nicole Gr{\"o}we-Kuska, and Werner R{\"o}misch.
+\newblock Scenario reduction in stochastic programming: An approach using
+  probability metrics.
+\newblock \emph{Mathematical Programming}, 95\penalty0 (3):\penalty0 493--511,
+  2003.
+\newblock \doi{10.1007/s10107-002-0331-0}.
+
+\bibitem[Gbadegoye et~al.(2025)Gbadegoye, Camur, and
+  Li]{gbadegoye2025intermodal}
+Jeremiah Gbadegoye, Mustafa~Can Camur, and Xueping Li.
+\newblock A two-stage stochastic model for road--rail intermodal freight
+  transportation under demand and capacity uncertainty.
+\newblock \emph{International Journal of Transportation Science and
+  Technology}, 2025.
+\newblock \doi{10.1016/j.ijtst.2025.07.004}.
+
+\bibitem[Haque et~al.(2026)Haque, Pervin, Gazi, and Mondal]{haque2026}
+Rakibul Haque, Magfura Pervin, Kamal~Hossain Gazi, and Sankar~Prasad Mondal.
+\newblock A comprehensive review of fractional inventory problems: models,
+  applications, and future directions.
+\newblock \emph{Management Science Advances}, 3\penalty0 (1):\penalty0
+  322--347, 2026.
+\newblock \doi{10.31181/msa31202647}.
+
+\bibitem[Heitsch and R{\"o}misch(2009)]{heitsch2009scenario}
+Holger Heitsch and Werner R{\"o}misch.
+\newblock Scenario tree reduction for multistage stochastic programs.
+\newblock \emph{Computational Management Science}, 6\penalty0 (2):\penalty0
+  117--133, 2009.
+\newblock \doi{10.1007/s10287-008-0087-y}.
+
+\bibitem[Kleywegt et~al.(2002)Kleywegt, Shapiro, and Homem-de
+  Mello]{kleywegt2002saa}
+Anton~J. Kleywegt, Alexander Shapiro, and Tito Homem-de Mello.
+\newblock The sample average approximation method for stochastic discrete
+  optimization.
+\newblock \emph{SIAM Journal on Optimization}, 12\penalty0 (2):\penalty0
+  479--502, 2002.
+\newblock \doi{10.1137/S1052623499363220}.
+
+\bibitem[Lin and Xu(2007)]{lin2007}
+Yumin Lin and Chuanju Xu.
+\newblock Finite difference/spectral approximations for the time-fractional
+  diffusion equation.
+\newblock \emph{Journal of Computational Physics}, 225\penalty0 (2):\penalty0
+  1533--1552, 2007.
+\newblock \doi{10.1016/j.jcp.2007.02.001}.
+
+\bibitem[Melnikov and Milz(2025)]{melnikov2025rqmc}
+Olena Melnikov and Johannes Milz.
+\newblock Randomized quasi-{M}onte {C}arlo methods for risk-averse stochastic
+  optimization.
+\newblock \emph{Journal of Optimization Theory and Applications}, 206:\penalty0
+  14, 2025.
+\newblock \doi{10.1007/s10957-025-02693-6}.
+
+\bibitem[Mirzaee et~al.(2024)Mirzaee, Samarghandi, and
+  Willoughby]{mirzaee2024green}
+Hossein Mirzaee, Hamed Samarghandi, and Keith Willoughby.
+\newblock Comparing resilience strategies for a multistage green supply chain
+  to mitigate disruptions: A two-stage stochastic optimization model.
+\newblock \emph{Journal of Cleaner Production}, 471:\penalty0 143165, 2024.
+\newblock \doi{10.1016/j.jclepro.2024.143165}.
+
+\bibitem[Pflug and Pichler(2012)]{pflug2012distance}
+Georg~Ch. Pflug and Alois Pichler.
+\newblock A distance for multistage stochastic optimization models.
+\newblock \emph{SIAM Journal on Optimization}, 22\penalty0 (1):\penalty0 1--23,
+  2012.
+\newblock \doi{10.1137/110825054}.
+\newblock URL \url{https://doi.org/10.1137/110825054}.
+
+\bibitem[Podlubny(1999)]{podlubny1999}
+Igor Podlubny.
+\newblock \emph{Fractional Differential Equations}.
+\newblock Academic Press, San Diego, 1999.
+
+\bibitem[Qu and Wu(2021)]{qu2021carbon}
+Deqiang Qu and Zhong Wu.
+\newblock Two-stage robust optimization model for fresh cold chain considering
+  carbon emissions and uncertainty.
+\newblock \emph{Complexity}, 2021:\penalty0 5556707, 2021.
+\newblock \doi{10.1155/2021/5556707}.
+
+\bibitem[Rockafellar and Uryasev(2000)]{rockafellar2000}
+R.~Tyrrell Rockafellar and Stanislav Uryasev.
+\newblock Optimization of conditional value-at-risk.
+\newblock \emph{Journal of Risk}, 2\penalty0 (3):\penalty0 21--41, 2000.
+\newblock \doi{10.21314/JOR.2000.038}.
+
+\bibitem[Rockafellar and Uryasev(2002)]{rockafellar2002cvar}
+R.~Tyrrell Rockafellar and Stanislav Uryasev.
+\newblock Conditional value-at-risk for general loss distributions.
+\newblock \emph{Journal of Banking \& Finance}, 26\penalty0 (7):\penalty0
+  1443--1471, 2002.
+\newblock \doi{10.1016/S0378-4266(02)00271-6}.
+
+\bibitem[Rockafellar and Wets(1991)]{rockafellar1991}
+R.~Tyrrell Rockafellar and Roger J.-B. Wets.
+\newblock Scenarios and policy aggregation in optimization under uncertainty.
+\newblock \emph{Mathematics of Operations Research}, 16\penalty0 (1):\penalty0
+  119--147, 1991.
+\newblock \doi{10.1287/moor.16.1.119}.
+
+\bibitem[Shapiro et~al.(2014)Shapiro, Dentcheva, and
+  Ruszczy{\'n}ski]{shapiro2014}
+Alexander Shapiro, Darinka Dentcheva, and Andrzej Ruszczy{\'n}ski.
+\newblock \emph{Lectures on Stochastic Programming: Modeling and Theory},
+  volume~16 of \emph{MOS-SIAM Series on Optimization}.
+\newblock Society for Industrial and Applied Mathematics, Philadelphia, PA,
+  second edition, 2014.
+\newblock ISBN 978-1-61197-342-6.
+\newblock \doi{10.1137/1.9781611973433}.
+
+\bibitem[Zhang et~al.(2022)Zhang, Fang, and Sun]{zhang2022fast}
+Jia-Li Zhang, Zhi-Wei Fang, and Hai-Wei Sun.
+\newblock Fast second-order evaluation for variable-order {C}aputo fractional
+  derivative with applications to fractional sub-diffusion equations.
+\newblock \emph{Numerical Mathematics: Theory, Methods and Applications},
+  15:\penalty0 200--226, 2022.
+\newblock \doi{10.4208/nmtma.OA-2021-0148}.
+
+\end{thebibliography}

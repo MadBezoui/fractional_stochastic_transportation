@@ -1,0 +1,38 @@
+\section{Calibration and implementation roadmap}
+This appendix outlines how the proposed model could be calibrated and deployed in a real transportation setting. The goal is to make the manuscript more directly useful for empirical follow-up work.
+
+\subsection{Data requirements}
+A practical implementation would ideally assemble four data blocks:
+\begin{enumerate}[label=\textbf{D\arabic*.},leftmargin=2.0em]
+    \item shipment and order history by customer, period, and mode;
+    \item service outcomes such as late deliveries, backlog, or stockout observations;
+    \item emissions and carbon-accounting factors by mode or vehicle class;
+    \item capacity and procurement information for transport modes and suppliers.
+\end{enumerate}
+These blocks are sufficient to calibrate both operational costs and the stochastic-demand layer. The most delicate calibration task is the fractional order.
+
+\subsection{Estimating the fractional order}
+There are several possible approaches to estimating $\alpha$.
+\begin{itemize}[leftmargin=1.8em]
+    \item \textbf{Autocorrelation decay matching:} estimate the empirical decay pattern of inventory discrepancy, congestion index, or service imbalance, then choose the fractional order whose implied memory kernel best matches the observed decay.
+    \item \textbf{Prediction-error minimization:} compare one-step-ahead or multi-step-ahead prediction performance of integer-order and fractional-order state equations on historical data.
+    \item \textbf{Indirect structural calibration:} estimate $\alpha$ jointly with dissipation parameters by minimizing the gap between observed and simulated system states over time.
+\end{itemize}
+No single method is universally best. The appropriate choice depends on data quality and whether the effective state variable is directly observed or latent.
+
+\subsection{Calibration of carbon-market parameters}
+Allowance endowment, buying price, and selling price can usually be obtained from regulatory or market data. The more difficult part is estimating unit emissions factors $e_{ijkt}$. These should reflect the operational granularity of the model. If the model distinguishes modes only coarsely, then emissions factors should also be aggregate. If the model distinguishes vehicle classes, load-dependent emissions, or route distances, then the emissions layer should be refined accordingly.
+
+\subsection{Deployment protocol}
+A reasonable deployment pathway consists of five stages:
+\begin{enumerate}[label=\textbf{P\arabic*.},leftmargin=2.0em]
+    \item build a historical backtest environment preserving decision chronology;
+    \item calibrate the demand process and candidate fractional orders;
+    \item solve the model on historical rolling windows or scenario sets;
+    \item compare outcomes against the incumbent planning policy;
+    \item validate service, cost, and emissions performance with managers.
+\end{enumerate}
+This protocol turns the present methodological paper into a directly testable empirical research agenda.
+
+\subsection{Journal-readiness implication}
+Including a calibration roadmap matters for submission. Reviewers often ask whether a methodological model can be used in practice. By specifying data requirements, estimation logic, and deployment steps, the paper demonstrates that the proposed fractional stochastic model is not purely theoretical. It is ready to be transferred into a case-study setting when the relevant operational data become available.

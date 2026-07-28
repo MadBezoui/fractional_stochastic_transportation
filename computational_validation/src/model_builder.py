@@ -70,7 +70,7 @@ def build_deterministic_equivalent(tree, params: TransportationModelParams):
     q = pulp.LpVariable.dicts("q", ((j, n.node_id) for j in params.J for n in tree.nodes), lowBound=0)
     u = pulp.LpVariable.dicts("u", ((j, n.node_id) for j in params.J for n in tree.nodes), lowBound=0)
     z = pulp.LpVariable.dicts("z", ((j, n.node_id) for j in params.J for n in tree.nodes), lowBound=0)
-    m = pulp.LpVariable.dicts("m", ((j, n.node_id) for j in params.J for n in tree.nodes), lowBound=-10000, upBound=10000)
+    m = pulp.LpVariable.dicts("m", ((j, n.node_id) for j in params.J for n in tree.nodes), lowBound=-params.m_bar[1]*10, upBound=params.m_bar[1]*10)
     
     b = pulp.LpVariable.dicts("b", (n.node_id for n in tree.nodes), lowBound=0, upBound=params.B_bar)
     s = pulp.LpVariable.dicts("s", (n.node_id for n in tree.nodes), lowBound=0, upBound=params.S_bar)
@@ -130,7 +130,7 @@ def build_deterministic_equivalent(tree, params: TransportationModelParams):
             
         if n.t > 0:
             E_t = pulp.lpSum(params.e[i, j, k] * x[i, j, k, n.node_id] for i in params.I for j in params.J for k in params.K)
-            model += E_t == params.E_cap + b[n.node_id] - s[n.node_id]
+            model += E_t <= params.E_cap + b[n.node_id] - s[n.node_id]
         
     for scenario in tree.scenarios:
         for j in params.J:
@@ -164,7 +164,11 @@ def build_deterministic_equivalent(tree, params: TransportationModelParams):
     
     return model, y, x, r, q, u, z, m, b, s, eta, xi
 
-def build_scenario_subproblem(omega_dict, params: TransportationModelParams, y_bar, eta_bar, mu_y, mu_eta, rho_PH):
+def build_scenario_subproblem(omega_dict, params: TransportationModelParams, 
+                              y_bar, eta_bar, 
+                              mu_y, mu_eta, 
+                              v_bar, mu_v,
+                              rho_PH):
     model = pulp.LpProblem(f"Fractional_PH_Subproblem_{omega_dict['omega']}", pulp.LpMinimize)
     
     y = pulp.LpVariable.dicts("y", params.K, lowBound=0, upBound=1)
@@ -179,7 +183,7 @@ def build_scenario_subproblem(omega_dict, params: TransportationModelParams, y_b
     q = pulp.LpVariable.dicts("q", ((j, n) for j in params.J for n in nodes), lowBound=0)
     u = pulp.LpVariable.dicts("u", ((j, n) for j in params.J for n in nodes), lowBound=0)
     z = pulp.LpVariable.dicts("z", ((j, n) for j in params.J for n in nodes), lowBound=0)
-    m = pulp.LpVariable.dicts("m", ((j, n) for j in params.J for n in nodes), lowBound=-10000, upBound=10000)
+    m = pulp.LpVariable.dicts("m", ((j, n) for j in params.J for n in nodes), lowBound=-params.m_bar[1]*10, upBound=params.m_bar[1]*10)
     
     b = pulp.LpVariable.dicts("b", nodes, lowBound=0, upBound=params.B_bar)
     s = pulp.LpVariable.dicts("s", nodes, lowBound=0, upBound=params.S_bar)
@@ -237,7 +241,7 @@ def build_scenario_subproblem(omega_dict, params: TransportationModelParams, y_b
             
         if node.t > 0:
             E_t = pulp.lpSum(params.e[i, j, k] * x[i, j, k, n] for i in params.I for j in params.J for k in params.K)
-            model += E_t == params.E_cap + b[n] - s[n]
+            model += E_t <= params.E_cap + b[n] - s[n]
         
     for j in params.J:
         for t_idx in range(len(path)):
@@ -260,29 +264,70 @@ def build_scenario_subproblem(omega_dict, params: TransportationModelParams, y_b
                 params.lambd * eta + \
                 (params.lambd / (1 - params.beta)) * xi
                 
-    s_eta_scale = 100.0
-    U = 10.0
-    L = 10
-    kappa = [ell * (U / L) for ell in range(L + 1)]
-    
-    u_eta = pulp.LpVariable("u_eta", lowBound=0)
-    u_eta_scaled = pulp.LpVariable("u_eta_scaled", lowBound=0, upBound=U)
-    
-    model += u_eta >= eta - eta_bar
-    model += u_eta >= eta_bar - eta
-    model += u_eta_scaled == u_eta / s_eta_scale
-    
-    s_eta_pwl = pulp.LpVariable("s_eta_pwl", lowBound=0)
-    for ell in range(1, L + 1):
-        model += s_eta_pwl >= (kappa[ell-1] + kappa[ell]) * u_eta_scaled - kappa[ell-1] * kappa[ell]
-        
+    # Add PWL penalties
     penalty = 0
+    
+    # Binary variables
     for k in params.K:
         y_val = float(y_bar[k])
         penalty += mu_y[k] * y[k] + (rho_PH / 2.0) * ((1 - 2 * y_val) * y[k] + y_val**2)
         
-    penalty += mu_eta * eta + (rho_PH / 2.0) * (s_eta_pwl * (s_eta_scale ** 2))
+    # Helper for continuous PWL penalty
+    U_bound = 10.0
+    L_segs = 10
+    kappa = [ell * (U_bound / L_segs) for ell in range(L_segs + 1)]
     
+    def add_pwl_penalty(var, var_bar, mu, s_scale, name_prefix):
+        nonlocal penalty
+        nonlocal model
+        u_var = pulp.LpVariable(f"{name_prefix}_u", lowBound=0)
+        u_var_scaled = pulp.LpVariable(f"{name_prefix}_u_scaled", lowBound=0, upBound=U_bound)
+        
+        model += u_var >= var - var_bar
+        model += u_var >= var_bar - var
+        model += u_var_scaled == (1.0 / s_scale) * u_var
+        
+        g_var = pulp.LpVariable(f"{name_prefix}_g", lowBound=0)
+        for ell in range(1, L_segs + 1):
+            model += g_var >= (kappa[ell-1] + kappa[ell]) * u_var_scaled - kappa[ell-1] * kappa[ell]
+            
+        penalty += mu * var + (rho_PH / 2.0) * (g_var * (s_scale ** 2))
+        
+    # Penalty for eta
+    add_pwl_penalty(eta, eta_bar, mu_eta, 100.0, "eta")
+    
+    # Penalties for operational variables
+    # s_h scales
+    scales = {
+        'x': 100.0, 'q': 100.0, 'u': 100.0, 'z': 100.0, 
+        'm': 1000.0, 'b': 50.0, 's': 50.0
+    }
+    
+    for n in nodes:
+        if n not in v_bar:
+            continue
+            
+        # x
+        for i in params.I:
+            for j in params.J:
+                for k in params.K:
+                    k_str = f"x_{i}_{j}_{k}"
+                    if k_str in v_bar[n]:
+                        add_pwl_penalty(x[i, j, k, n], v_bar[n][k_str], mu_v[n][k_str], scales['x'], f"x_{i}_{j}_{k}_{n}")
+                        
+        # q, u, z, m
+        for j in params.J:
+            for key, var_dict in [('q', q), ('u', u), ('z', z), ('m', m)]:
+                k_str = f"{key}_{j}"
+                if k_str in v_bar[n]:
+                    add_pwl_penalty(var_dict[j, n], v_bar[n][k_str], mu_v[n][k_str], scales[key], f"{k_str}_{n}")
+                    
+        # b, s
+        if 'b' in v_bar[n]:
+            add_pwl_penalty(b[n], v_bar[n]['b'], mu_v[n]['b'], scales['b'], f"b_{n}")
+        if 's' in v_bar[n]:
+            add_pwl_penalty(s[n], v_bar[n]['s'], mu_v[n]['s'], scales['s'], f"s_{n}")
+            
     model += phi_tilde + penalty
     
     return model, y, x, r, q, u, z, m, b, s, eta, xi

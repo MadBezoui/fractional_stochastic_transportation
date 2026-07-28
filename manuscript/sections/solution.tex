@@ -1,0 +1,106 @@
+\section{Solution methodology}
+The optimization model combines binary first-stage decisions, scenario-dependent recourse, CVaR risk aversion, and temporally dense fractional-memory constraints. Solving the deterministic equivalent directly is possible for moderate benchmark sizes, but the scenario dimension can quickly become computationally burdensome. This section therefore develops a solution framework based on sample-average approximation (SAA) and progressive hedging (PH).
+
+\subsection{Sample-average approximation}
+Let the underlying demand process be represented by a probability law over demand trajectories. The expected-value component of the objective is replaced by an empirical mean computed from a finite scenario sample. Specifically, let $\Omega_M=\{\omega_1,\dots,\omega_M\}$ denote a sample of $M$ demand trajectories generated from the drift-diffusion process or from an equivalent scenario-generation mechanism. Then the expected recourse term is approximated by
+\begin{equation}
+\sum_{\omega\in\Omega}p_{\omega} C^{\omega}
+\approx \frac{1}{M}\sum_{m=1}^{M} C^{\omega_m},
+\end{equation}
+possibly after probability bundling or scenario reduction when the sample is large.
+
+SAA is attractive here for two reasons. First, it avoids the need to solve a continuous-state stochastic control problem directly. Second, it allows the numerical study to separate two issues: the structural effect of fractional memory and the statistical effect of scenario richness. In practice, the scenario sample can be regenerated repeatedly to evaluate out-of-sample stability.
+
+\subsection{Progressive hedging decomposition}
+Once the scenario set is fixed, the main coupling across scenarios occurs through the first-stage decisions. Progressive hedging relaxes nonanticipativity and penalizes disagreement across scenario copies of the first-stage vector. Let $v^{\omega}$ denote the copy of the first-stage vector associated with scenario $\omega$, and let
+\begin{equation}
+\bar v=\sum_{\omega\in\Omega} p_{\omega} v^{\omega}
+\end{equation}
+be the probability-weighted consensus. At iteration $r$, each scenario subproblem includes the penalty term
+\begin{equation}
+ (\lambda^{\omega,r})^{\top}v^{\omega}+\frac{\rho_{PH}}{2}\|v^{\omega}-\bar v^r\|_2^2,
+\end{equation}
+where $\lambda^{\omega,r}$ is the scenario multiplier and $\rho_{PH}>0$ is the progressive-hedging penalty parameter.
+
+The multiplier update is
+\begin{equation}
+\lambda^{\omega,r+1}=\lambda^{\omega,r}+\rho_{PH}(v^{\omega,r+1}-\bar v^{r+1}).
+\end{equation}
+For mixed-integer models, PH does not guarantee global optimality in the same way as in purely convex settings. Nevertheless, it performs well empirically on many scenario-based mixed-integer problems, especially when combined with stabilization rules and validation on an independent sample.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.3cm and 2.0cm,
+    block/.style={draw, rounded corners=3pt, minimum width=2.6cm, minimum height=0.9cm, align=center, font=\small, fill=purple!5},
+    arr/.style={->, >=stealth, thick, color=black!75}
+]
+    \node[block, fill=blue!10, minimum width=6cm] (saa) {SAA Training Scenarios $\Omega_M = \{\omega_1, \dots, \omega_M\}$};
+    
+    \node[block, fill=green!10, below left=1.2cm and -0.5cm of saa] (sp1) {Subproblem SP$(\omega_1)$\\Variable $v^{\omega_1, (r)}$};
+    \node[block, fill=green!10, below=1.2cm of saa] (sp2) {Subproblem SP$(\omega_2)$\\Variable $v^{\omega_2, (r)}$};
+    \node[block, fill=green!10, below right=1.2cm and -0.5cm of saa] (spM) {Subproblem SP$(\omega_M)$\\Variable $v^{\omega_M, (r)}$};
+
+    \path (sp2) to node[font=\bfseries] {$\dots$} (spM);
+
+    \node[block, fill=orange!10, below=1.4cm of sp2, minimum width=6.5cm] (cons) {Consensus Aggregation \& Multiplier Update\\$\bar{v}^{(r)} = \sum p_\omega v^{\omega, (r)}, \quad \lambda^{\omega, (r+1)} = \lambda^{\omega, (r)} + \rho_{PH}(v^{\omega, (r)} - \bar{v}^{(r)})$};
+
+    \draw[arr] (saa) to (sp1);
+    \draw[arr] (saa) to (sp2);
+    \draw[arr] (saa) to (spM);
+
+    \draw[arr, <->] (sp1) to (cons.north west);
+    \draw[arr, <->] (sp2) to (cons.north);
+    \draw[arr, <->] (spM) to (cons.north east);
+\end{tikzpicture}
+\caption{Schematic of the Sample Average Approximation (SAA) and Progressive Hedging (PH) scenario decomposition and consensus-enforcement workflow.}
+\label{fig:ph_schematic}
+\end{figure}
+
+
+
+
+
+\subsection{Scenario subproblem structure}
+For a fixed scenario $\omega$ and fixed penalty terms, the subproblem contains:
+\begin{itemize}[leftmargin=1.8em]
+    \item binary activation variables or their scenario copies,
+    \item linear capacity and service constraints,
+    \item linearized CVaR components,
+    \item linear carbon-balance constraints,
+    \item discretized fractional balance equations with dense temporal coupling.
+\end{itemize}
+Without PH penalties the scenario problem is a mixed-integer linear program if the first-stage variables are fixed. With PH quadratic penalties it becomes a mixed-integer convex quadratic program. The temporal density created by the L1 approximation remains inside each scenario block, so PH primarily addresses scenario proliferation rather than memory coupling.
+
+\subsection{Binary stabilization and fixing}
+Because the first-stage vector contains binary decisions, scenario copies can oscillate near the boundary for many PH iterations. To improve convergence, we employ a practical fixing rule. If the consensus value of a binary component remains sufficiently close to zero or one for a prescribed number of iterations, the component is fixed at the corresponding integer value in later iterations. This rule is heuristic, but it is standard and often effective in mixed-integer PH implementations.
+
+A moderate penalty schedule is important. If $\rho_{PH}$ is too small, scenario copies may drift apart and convergence becomes slow. If it is too large, early binary fixing may force poor agreement before the scenario subproblems have stabilized. The numerical study later illustrates this sensitivity through algorithmic-scaling results.
+
+\subsection{Validation logic}
+A key feature of the proposed methodology is the use of an independent validation sample after optimization. Because the scenario sample used in SAA is finite, a policy that performs well in-sample may overfit the training scenarios. Validation therefore proceeds as follows:
+\begin{enumerate}[label=\arabic*. ,leftmargin=1.6em]
+    \item generate a training scenario sample and solve the SAA problem,
+    \item recover the consensus first-stage decision from PH,
+    \item re-evaluate the resulting policy on an independent validation sample,
+    \item report expected cost, CVaR, service, and emissions on the validation set.
+\end{enumerate}
+This validation step is particularly important in a fractional setting because long-memory coupling can amplify the effect of individual scenario peculiarities.
+
+\subsection{Pseudo-algorithm}
+The overall workflow can be summarized textually as follows.
+\begin{enumerate}[label=\textbf{Step \arabic*:},leftmargin=2.2em]
+    \item Generate or estimate a finite scenario set from the stochastic demand process.
+    \item Choose the fractional order $\alpha$ and compute the associated L1 coefficients.
+    \item Initialize multipliers and solve scenario subproblems independently.
+    \item Update the consensus first-stage vector and PH multipliers.
+    \item Apply stabilization or fixing rules for binary variables if appropriate.
+    \item Repeat until nonanticipativity residuals fall below tolerance.
+    \item Evaluate the recovered policy on an independent scenario sample.
+\end{enumerate}
+
+\subsection{Computational complexity discussion}
+The complexity of the method is driven by three factors. The first is the number of scenarios in the SAA approximation. The second is the length of the planning horizon, because the L1 discretization couples every period to all earlier periods. The third is the number of binary design or activation decisions. In a purely integer-order transportation model, the temporal coupling is usually local and sparse. Under Caputo memory, the constraint matrix becomes denser. This is the primary reason why specialized acceleration techniques may be desirable in larger instances.
+
+Potential future improvements include reduced-memory approximations, convolution acceleration, warm-started branch-and-bound, Benders-like decomposition for fixed first-stage policies, and hybrid PH strategies in which the memory equations are partially aggregated. These possibilities are discussed later, but the benchmark scale considered in the paper can be handled adequately by the present SAA-PH framework.
+

@@ -1,0 +1,45 @@
+Restricted license - for non-production use only - expires 2027-11-29
+\begin{table}[ht]
+\centering
+\caption{Complete instance definition for the four-scenario toy experiment ($N=2$ optimization periods).}
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value or Rule} \\
+\midrule
+$|I|, |J|, |K|, N, |\Omega|$ & $|I|=1, |J|=2, |K|=2, N=2, |\Omega|=4$ \\
+$S_{it}$ & 100 $\forall i, t$ \\
+$\widehat{d}_{jtn}$ & $d_{10}=10, d_{20}=15$, branching at $\pm 50\%$ \\
+$Q_{kt}$ & 50 $\forall k, t$ \\
+$c_{ijkt}$ & 10 $\forall i, j, k, t$ \\
+$f_k$ & 0 $\forall k$ (Strategic capacity cost) \\
+$e_{ijkt}$ & 0.5 $\forall i, j, k, t$ \\
+$A_t, p_t^b, p_t^s$ & $A_t=10, p_t^b=10, p_t^s=8$ \\
+$h_{jt}, \pi_{jt}$ & $h_{jt}=2, \pi_{jt}=500$ \\
+$\delta_j, \gamma_j$ & $\delta_j=0.05, \gamma_j=0$ \\
+$\alpha, \rho_j, \psi_j, \chi_j$ & $\alpha=0.8, \rho_j=0.1, \psi_j=0.5, \chi_j=0.5$ \\
+$\overline{m}_{jt}, \overline{z}_{jt}$ & $\overline{m}_{jt}=1000, \overline{z}_{jt}=1000$ \\
+$\beta, \lambda, \Delta\tau$ & $\beta=0.9, \lambda=0.5, \Delta\tau=1$ \\
+Solver specs & Gurobi, MIPGap $10^{-4}$ \\
+PH params & $\rho_{\mathrm{PH}}=500, \varepsilon=10^{-2}$, MaxIter 20 \\
+\bottomrule
+\end{tabular}
+\label{tab:instance_def}
+\end{table}
+
+
+
+\begin{table}[ht]
+\centering
+\caption{Scenario-level outcomes for the four-scenario toy instance ($A_t=10, p_t^b=10, p_t^s=8$). All values satisfy $C^\omega = C_{\mathrm{transport}}^\omega + C_{\mathrm{holding}}^\omega + C_{\mathrm{lost}}^\omega + C_{\mathrm{carbon}}^\omega$.}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+Scen & Prob & Op.Cost & Lost-Sales & Holding & C.Trading & Total ($C^\omega$) & Emissions & Buy & Sell \\
+\midrule
+$\omega_0$ & 0.25 & 319.3 & 0.0 & 13.9 & 59.6 & \textbf{392.7} & 16.0 & 6.0 & 0.0 \\
+$\omega_1$ & 0.25 & 375.0 & 0.0 & 13.2 & 87.5 & \textbf{475.7} & 18.8 & 8.8 & 0.0 \\
+$\omega_2$ & 0.25 & 59.2 & 0.0 & 0.0 & -56.3 & \textbf{2.9} & 3.0 & 0.0 & 7.0 \\
+$\omega_3$ & 0.25 & 500.0 & 0.0 & 0.0 & 150.0 & \textbf{650.0} & 25.0 & 15.0 & 0.0 \\
+\bottomrule
+\end{tabular}
+\label{tab:scenarios}
+\end{table}

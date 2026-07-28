@@ -1,0 +1,51 @@
+\section{Notation summary}
+For the reader's convenience, this appendix collects the principal notation used in the manuscript.
+
+\begin{longtable}{p{0.22\textwidth}p{0.70\textwidth}}
+\caption{Main notation used in the fractional stochastic transportation model.}\\
+\toprule
+Symbol & Meaning\\
+\midrule
+\endfirsthead
+\toprule
+Symbol & Meaning\\
+\midrule
+\endhead
+$I$ & Set of suppliers.\\
+$J$ & Set of customers or demand zones.\\
+$K$ & Set of transportation modes.\\
+$T=\{1,\dots,N\}$ & Set of planning periods.\\
+$\Omega$ & Set of demand scenarios.\\
+$p_{\omega}$ & Probability of scenario $\omega$.\\
+$S_{it}$ & Supply available at supplier $i$ in period $t$.\\
+$d_{jt}^{\omega}$ & Demand of customer $j$ in period $t$ under scenario $\omega$.\\
+$c_{ijkt}$ & Unit transportation cost on supplier--customer--mode arc $(i,j,k)$ in period $t$.\\
+$e_{ijkt}$ & Unit emissions factor on arc $(i,j,k)$ in period $t$.\\
+$Q_k$ & Capacity coefficient of transportation mode $k$.\\
+$f_k$ & Fixed activation cost of mode $k$.\\
+$h_j$ & Cost coefficient associated with the effective state at customer $j$.\\
+$\pi_j$ & Unit shortage penalty for customer $j$.\\
+$A$ & Initial allowance endowment in the carbon market.\\
+$p^b$ & Carbon-allowance buying price.\\
+$p^s$ & Carbon-allowance selling price.\\
+$\rho_j$ & Dissipation or deterioration parameter in the fractional state equation.\\
+$\gamma_j$ & Minimum required service fraction for customer $j$.\\
+$\alpha$ & Fractional order in the Caputo derivative, with $0<\alpha<1$.\\
+$\beta$ & Confidence level used in the CVaR risk measure.\\
+$\lambda$ & Weight assigned to the CVaR term in the objective.\\
+$y_k$ & Binary variable indicating whether mode $k$ is activated.\\
+$x_{ijkt}^{\omega}$ & Shipment from supplier $i$ to customer $j$ by mode $k$ in period $t$ under scenario $\omega$.\\
+$z_{jt}^{\omega}$ & Effective inventory--service state of customer $j$ in period $t$ under scenario $\omega$.\\
+$u_{jt}^{\omega}$ & Shortage of customer $j$ in period $t$ under scenario $\omega$.\\
+$b^{\omega}$ & Carbon allowances purchased under scenario $\omega$.\\
+$s^{\omega}$ & Carbon allowances sold under scenario $\omega$.\\
+$C^{\omega}$ & Total scenario-dependent operational cost.\\
+$E^{\omega}$ & Total scenario-dependent emissions.\\
+$\eta$ & Auxiliary CVaR threshold variable.\\
+$\xi_{\omega}$ & Auxiliary excess variable for CVaR linearization.\\
+$a_r$ & L1 discretization coefficient, $a_r=(r+1)^{1-\alpha}-r^{1-\alpha}$.\\
+$\Delta t$ & Length of one planning interval.\\
+\bottomrule
+\end{longtable}
+
+The notation is deliberately kept compact so that the model can be adapted to richer network structures without changing its conceptual core.
