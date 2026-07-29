@@ -1,0 +1,12 @@
+{
+  "title": "A Fractional Stochastic Transportation Model with Caputo Memory, Demand Uncertainty, CVaR, and Carbon Trading",
+  "upload_type": "software",
+  "description": "Computational archive with complete experimental validation and LaTeX manuscript.",
+  "creators": [
+    {
+      "name": "Transportation Logistics Lab"
+    }
+  ],
+  "access_right": "open",
+  "license": "MIT"
+}
