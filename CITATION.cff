@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software or benchmark suite in your research, please cite it as below."
+authors:
+  - family-names: "Research Team"
+    given-names: "Transportation Logistics Lab"
+title: "A Fractional Stochastic Transportation Model with Caputo Memory, Demand Uncertainty, CVaR, and Carbon Trading"
+version: 0.1.0
+date-released: 2026-07-28
+url: "https://github.com/example/fractional-stochastic-transportation"
+license: MIT
